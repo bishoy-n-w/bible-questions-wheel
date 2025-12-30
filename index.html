@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>عجلة الحظ الكتابية - فرق</title>
+    <title>Bible Wheel Game</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -28,13 +28,11 @@
             justify-content: center;
         }
 
-        /* ====================
-           FULL SCREEN BTN
-           ==================== */
+        /* --- Fullscreen Btn --- */
         .fullscreen-btn {
             position: fixed;
             top: 20px;
-            left: 20px;
+            left: 20px; /* Will flip in RTL */
             background: rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
@@ -44,297 +42,120 @@
             height: 40px;
             cursor: pointer;
             z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 1.2rem;
-            transition: background 0.2s;
         }
-        .fullscreen-btn:hover { background: rgba(0,0,0,0.6); }
+        [dir="rtl"] .fullscreen-btn { left: 20px; right: auto; }
+        [dir="ltr"] .fullscreen-btn { right: 20px; left: auto; }
 
-        /* ====================
-           INTRO SCREEN
-           ==================== */
-        #introScreen {
-            display: flex;
+        /* --- Screens --- */
+        .screen {
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             width: 100%;
             height: 100%;
-            z-index: 50;
-            background: var(--bg-color);
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
             overflow-y: auto;
         }
 
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 5px;
-            color: var(--accent-color);
-            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .section-title {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            color: #bdc3c7;
-            border-bottom: 1px solid #7f8c8d;
-            padding-bottom: 5px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        /* Team Selector */
-        .team-select-grid {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .team-btn {
-            background: transparent;
-            border: 2px solid #7f8c8d;
-            color: #bdc3c7;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .team-btn.selected {
-            background: var(--accent-color);
-            color: var(--bg-color);
-            border-color: var(--accent-color);
-            font-weight: bold;
-            transform: scale(1.1);
-        }
-
-        /* Group Grid */
-        .group-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            width: 100%;
-            max-width: 500px;
-            margin-bottom: 25px;
-        }
-
-        .group-btn {
+        /* --- 1. Language Screen --- */
+        #langScreen { display: flex; } /* Initial Screen */
+        
+        .lang-btn {
             background: white;
             color: var(--bg-color);
-            border: 3px solid transparent;
-            padding: 12px;
-            font-size: 1rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            opacity: 0.8;
-            transition: all 0.2s;
-        }
-
-        .group-btn:hover { opacity: 1; transform: translateY(-2px); }
-
-        .group-btn.selected {
-            border-color: var(--selected-color);
-            background: #e8f8f5;
-            color: #27ae60;
-            opacity: 1;
-        }
-
-        .start-game-btn {
-            background: var(--accent-color);
-            color: var(--bg-color);
             border: none;
-            padding: 15px 60px;
+            padding: 20px 40px;
+            margin: 10px;
             font-size: 1.5rem;
             border-radius: 50px;
             cursor: pointer;
+            width: 80%;
+            max-width: 300px;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             transition: transform 0.2s;
         }
+        .lang-btn:hover { transform: scale(1.05); background: var(--accent-color); color: white; }
+
+        /* --- 2. Intro Screen --- */
+        h1 { font-size: 2rem; margin-bottom: 5px; color: var(--accent-color); text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .section-title { margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; color: #bdc3c7; border-bottom: 1px solid #7f8c8d; padding-bottom: 5px; width: 100%; max-width: 400px; }
         
-        .start-game-btn:disabled {
-            background: #7f8c8d;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
+        .team-select-grid { display: flex; gap: 10px; margin-bottom: 20px; }
+        .team-btn { background: transparent; border: 2px solid #7f8c8d; color: #bdc3c7; width: 50px; height: 50px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; }
+        .team-btn.selected { background: var(--accent-color); color: var(--bg-color); border-color: var(--accent-color); font-weight: bold; transform: scale(1.1); }
 
-        /* ====================
-           GAME SCREEN & SCOREBOARD
-           ==================== */
-        #gameScreen {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
+        .group-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 500px; margin-bottom: 25px; }
+        .group-btn { background: white; color: var(--bg-color); border: 3px solid transparent; padding: 12px; font-size: 1rem; border-radius: 12px; cursor: pointer; font-weight: bold; opacity: 0.8; transition: all 0.2s; }
+        .group-btn:hover { opacity: 1; transform: translateY(-2px); }
+        .group-btn.selected { border-color: var(--selected-color); background: #e8f8f5; color: #27ae60; opacity: 1; }
 
-        /* Scoreboard Bar */
-        .scoreboard {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 5px;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
-            z-index: 30;
-            box-sizing: border-box;
-        }
+        .start-game-btn { background: var(--accent-color); color: var(--bg-color); border: none; padding: 15px 60px; font-size: 1.5rem; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .start-game-btn:disabled { background: #7f8c8d; cursor: not-allowed; opacity: 0.5; }
 
-        .team-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 5px 15px;
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-            flex: 1;
-            margin: 0 5px;
-            max-width: 100px;
-        }
-
-        .team-card.active-turn {
-            background: white;
-            color: var(--bg-color);
-            border-color: var(--accent-color);
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(241, 196, 15, 0.5);
-        }
-
-        .team-name { font-size: 0.8rem; display: block; margin-bottom: 2px; }
+        /* --- 3. Game Screen --- */
+        #gameScreen { position: relative; }
+        .scoreboard { position: absolute; top: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 10px 5px; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); z-index: 30; box-sizing: border-box; }
+        .team-card { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 5px 10px; text-align: center; border: 2px solid transparent; transition: all 0.3s; flex: 1; margin: 0 5px; max-width: 100px; }
+        .team-card.active-turn { background: white; color: var(--bg-color); border-color: var(--accent-color); transform: scale(1.05); box-shadow: 0 0 15px rgba(241, 196, 15, 0.5); }
+        .team-name { font-size: 0.8rem; display: block; }
         .team-score { font-size: 1.2rem; font-weight: bold; }
 
-        .wheel-container {
-            position: relative;
-            width: 75vmin;
-            height: 75vmin;
-            max-width: 500px;
-            max-height: 500px;
-            margin-top: 60px; /* Space for scoreboard */
-            margin-bottom: 10px;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
-        }
+        .wheel-container { position: relative; width: 75vmin; height: 75vmin; max-width: 500px; max-height: 500px; margin-top: 60px; margin-bottom: 10px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); }
+        canvas { width: 100%; height: 100%; border-radius: 50%; }
+        .pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; }
 
-        canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        .pointer {
-            position: absolute;
-            top: -25px; left: 50%; transform: translateX(-50%);
-            width: 50px; height: 50px;
-            background: #e74c3c;
-            clip-path: polygon(50% 100%, 0 0, 100% 0);
-            z-index: 10;
-        }
-
-        button.spin-btn {
-            padding: 12px 40px;
-            font-size: 1.3rem;
-            border: none;
-            border-radius: 50px;
-            background: var(--accent-color);
-            color: var(--bg-color);
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
+        .controls { display: flex; flex-direction: column; align-items: center; z-index: 20; }
+        button.spin-btn { padding: 12px 40px; font-size: 1.3rem; border: none; border-radius: 50px; background: var(--accent-color); color: var(--bg-color); font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         button.spin-btn:disabled { background: #95a5a6; }
 
-        /* ====================
-           MODAL & GAME OVER
-           ==================== */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .modal-box {
-            background: white;
-            color: var(--bg-color);
-            padding: 25px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .winner-box {
-            background: linear-gradient(135deg, #f1c40f, #f39c12);
-            color: #2c3e50;
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            animation: popIn 0.5s ease;
-        }
-
-        .rank-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
-            text-align: right;
-        }
-        .rank-item {
-            background: rgba(255,255,255,0.3);
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-        }
-
+        /* --- Modal --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-box { background: white; color: var(--bg-color); padding: 25px; border-radius: 20px; width: 100%; max-width: 500px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
         .question-text { font-size: 1.4rem; margin: 20px 0; font-weight: bold; }
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .opt-btn { padding: 12px; border: 2px solid #bdc3c7; background: white; border-radius: 10px; font-size: 1rem; cursor: pointer; color: var(--bg-color); }
         .reference-box { display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-right: 5px solid #2ecc71; text-align: right; }
+        [dir="ltr"] .reference-box { border-right: none; border-left: 5px solid #2ecc71; text-align: left; }
         
+        .action-btn { width:auto; height:auto; padding:10px 30px; background:#2c3e50; color:white; border:none; border-radius:10px; margin-top:15px; cursor: pointer; font-size: 1rem; }
+
+        /* --- Game Over --- */
+        .winner-box { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #2c3e50; padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; animation: popIn 0.5s ease; }
+        .rank-list { list-style: none; padding: 0; margin-top: 20px; text-align: inherit; }
+        .rank-item { background: rgba(255,255,255,0.3); margin: 5px 0; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; }
         @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* Landscape Mobile */
         @media (max-height: 500px) and (orientation: landscape) {
             #gameScreen { flex-direction: row; align-items: center; }
             .scoreboard { width: 150px; height: 100%; top:0; left:0; flex-direction: column; justify-content: center; }
+            [dir="ltr"] .scoreboard { left: auto; right: 0; }
             .wheel-container { margin-top: 0; margin-left: 160px; height: 85vmin; width: 85vmin; }
+            [dir="ltr"] .wheel-container { margin-left: 0; margin-right: 160px; }
             .controls { position: absolute; bottom: 20px; right: 20px; }
+            [dir="ltr"] .controls { right: auto; left: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <button class="fullscreen-btn" onclick="toggleFullScreen()" title="ملء الشاشة">⛶</button>
+    <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Toggle Fullscreen">⛶</button>
 
-    <div id="introScreen">
-        <h1>مسابقة الكتاب المقدس</h1>
+    <div id="langScreen" class="screen">
+        <h1 style="margin-bottom: 40px;">✟ Bible Quiz</h1>
+        <button class="lang-btn" onclick="setLanguage('ar')">العربية</button>
+        <button class="lang-btn" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" onclick="setLanguage('fr')">Français</button>
+    </div>
+
+    <div id="introScreen" class="screen">
+        <h1 id="ui-title">مسابقة الكتاب المقدس</h1>
         
-        <div class="section-title">عدد الفرق المتنافسة</div>
+        <div class="section-title" id="ui-teams">عدد الفرق</div>
         <div class="team-select-grid">
             <button class="team-btn selected" onclick="selectTeams(1)">1</button>
             <button class="team-btn" onclick="selectTeams(2)">2</button>
@@ -342,20 +163,19 @@
             <button class="team-btn" onclick="selectTeams(4)">4</button>
         </div>
 
-        <div class="section-title">مجموعة الأسئلة</div>
+        <div class="section-title" id="ui-groups">مجموعة الأسئلة</div>
         <div class="group-grid">
-            <button class="group-btn" id="btn-1" onclick="toggleGroup(1)">المستوى 1 (1-25)</button>
-            <button class="group-btn" id="btn-2" onclick="toggleGroup(2)">المستوى 2 (26-50)</button>
-            <button class="group-btn" id="btn-3" onclick="toggleGroup(3)">المستوى 3 (51-75)</button>
-            <button class="group-btn" id="btn-4" onclick="toggleGroup(4)">المستوى 4 (76-100)</button>
+            <button class="group-btn" id="btn-1" onclick="toggleGroup(1)">1</button>
+            <button class="group-btn" id="btn-2" onclick="toggleGroup(2)">2</button>
+            <button class="group-btn" id="btn-3" onclick="toggleGroup(3)">3</button>
+            <button class="group-btn" id="btn-4" onclick="toggleGroup(4)">4</button>
         </div>
 
         <button class="start-game-btn" id="startBtn" onclick="confirmStart()" disabled>ابدأ المسابقة</button>
     </div>
 
-    <div id="gameScreen">
-        <div class="scoreboard" id="scoreboard">
-            </div>
+    <div id="gameScreen" class="screen">
+        <div class="scoreboard" id="scoreboard"></div>
 
         <div class="wheel-container">
             <div class="pointer"></div>
@@ -364,8 +184,8 @@
 
         <div class="controls">
             <div id="turnMsg" style="color:var(--accent-color); margin-bottom:10px; font-weight:bold;"></div>
-            <button class="spin-btn" id="spinBtn" onclick="spin()">دوّر العجلة!</button>
-            <button class="team-btn" style="width:auto; height:auto; padding:5px 15px; border-radius:15px; font-size:0.8rem; margin-top:10px;" onclick="location.reload()">إنهاء</button>
+            <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN!</button>
+            <button class="action-btn" id="endBtn" style="background:transparent; border:1px solid #7f8c8d; color:#bdc3c7; margin-top:10px; padding: 5px 15px;" onclick="location.reload()">End Game</button>
         </div>
     </div>
 
@@ -375,50 +195,143 @@
             <div class="question-text" id="mQuestion">...</div>
             <div class="options-grid" id="mOptions"></div>
             <div class="reference-box" id="mReference"></div>
-            <button class="team-btn" id="closeBtn" style="display:none; width:auto; height:auto; padding:10px 30px; background:#2c3e50; color:white; border:none; border-radius:10px; margin-top:15px;" onclick="closeModal()">التالي</button>
+            <button class="action-btn" id="closeBtn" style="display:none;" onclick="closeModal()">Next</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="gameOverModal">
         <div class="winner-box">
-            <h2 style="margin:0; font-size:2rem;">🏆 النتائج النهائية</h2>
+            <h2 style="margin:0; font-size:2rem;" id="ui-results">🏆 Results</h2>
             <div id="winnerName" style="font-size:1.5rem; margin:15px 0; font-weight:bold;"></div>
             <ul class="rank-list" id="rankList"></ul>
-            <button class="team-btn" style="background:white; color:#2c3e50; width:auto; height:auto; padding:10px 30px; border-radius:20px; font-weight:bold; margin-top:20px;" onclick="location.reload()">لعبة جديدة</button>
+            <button class="action-btn" style="background:white; color:#2c3e50; font-weight:bold; margin-top:20px;" onclick="location.reload()" id="ui-newgame">New Game</button>
         </div>
     </div>
 
-    <script src="rawData.js"></script>
+    <script src="questions.js"></script>
 
     <script>
         // =====================================
-        // GLOBAL VARIABLES
+        // TRANSLATION DATA
         // =====================================
-        let allQuestions = [];
+        const translations = {
+            ar: {
+                title: "مسابقة الكتاب المقدس",
+                teams: "عدد الفرق المتنافسة",
+                groups: "مجموعة الأسئلة",
+                start: "ابدأ المسابقة",
+                selectGroup: "اختر مجموعة",
+                spin: "دوّر العجلة!",
+                end: "خروج",
+                turn: "دور الفريق",
+                team: "الفريق",
+                next: "التالي",
+                ref: "الشاهد:",
+                results: "النتائج النهائية",
+                winner: "الفائز",
+                newgame: "لعبة جديدة",
+                levels: {1:"سهل", 2:"متوسط", 3:"صعب", 4:"خبير"},
+                groupNames: ["المستوى 1 (1-25)", "المستوى 2 (26-50)", "المستوى 3 (51-75)", "المستوى 4 (76-100)"]
+            },
+            en: {
+                title: "Bible Quiz",
+                teams: "Number of Teams",
+                groups: "Question Groups",
+                start: "Start Game",
+                selectGroup: "Select Group",
+                spin: "Spin Wheel!",
+                end: "Exit",
+                turn: "Team Turn:",
+                team: "Team",
+                next: "Next",
+                ref: "Reference:",
+                results: "Final Results",
+                winner: "Winner",
+                newgame: "New Game",
+                levels: {1:"Easy", 2:"Medium", 3:"Hard", 4:"Expert"},
+                groupNames: ["Level 1 (1-25)", "Level 2 (26-50)", "Level 3 (51-75)", "Level 4 (76-100)"]
+            },
+            fr: {
+                title: "Quiz Biblique",
+                teams: "Nombre d'équipes",
+                groups: "Groupes de questions",
+                start: "Commencer",
+                selectGroup: "Choisir un groupe",
+                spin: "Tournez la roue !",
+                end: "Quitter",
+                turn: "Tour de l'équipe",
+                team: "Équipe",
+                next: "Suivant",
+                ref: "Référence:",
+                results: "Résultats finaux",
+                winner: "Gagnant",
+                newgame: "Nouvelle partie",
+                levels: {1:"Facile", 2:"Moyen", 3:"Difficile", 4:"Expert"},
+                groupNames: ["Niveau 1 (1-25)", "Niveau 2 (26-50)", "Niveau 3 (51-75)", "Niveau 4 (76-100)"]
+            }
+        };
+
+        // =====================================
+        // STATE
+        // =====================================
+        let currentLang = 'ar';
+        let allQuestions = []; // Loaded from gameData based on lang
         let currentQuestions = [];
         let selectedGroups = new Set();
         let numTeams = 1;
         let scores = [0, 0, 0, 0];
-        let currentTeamIndex = 0; // 0 to 3
+        let currentTeamIndex = 0;
         let audioCtx = null;
-        let hasAnsweredCorrectly = false; // Track if current turn earned points
         
         const levelColors = { 1: "#2ecc71", 2: "#f1c40f", 3: "#e67e22", 4: "#e74c3c" };
 
         // =====================================
-        // 1. SETUP & INTRO
+        // 1. LANGUAGE & SETUP
         // =====================================
-        window.onload = function() {
-            if (typeof rawData !== 'undefined') {
-                allQuestions = JSON.parse(JSON.stringify(rawData));
-            } else {
-                alert("Error: rawData.js not found");
-            }
-        };
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // 1. Set Direction
+            const dir = (lang === 'ar') ? 'rtl' : 'ltr';
+            document.documentElement.setAttribute('dir', dir);
+            document.documentElement.setAttribute('lang', lang);
 
+            // 2. Load Data
+            if (typeof gameData !== 'undefined' && gameData[lang]) {
+                allQuestions = JSON.parse(JSON.stringify(gameData[lang]));
+            } else {
+                alert("Error: Questions for this language not found in questions.js");
+                return;
+            }
+
+            // 3. Update UI Text
+            const t = translations[lang];
+            document.getElementById('ui-title').innerText = t.title;
+            document.getElementById('ui-teams').innerText = t.teams;
+            document.getElementById('ui-groups').innerText = t.groups;
+            document.getElementById('startBtn').innerText = t.selectGroup; // Initially disabled
+            document.getElementById('spinBtn').innerText = t.spin;
+            document.getElementById('endBtn').innerText = t.end;
+            document.getElementById('closeBtn').innerText = t.next;
+            document.getElementById('ui-results').innerText = t.results;
+            document.getElementById('ui-newgame').innerText = t.newgame;
+
+            // Update Group Buttons Text
+            document.getElementById('btn-1').innerText = t.groupNames[0];
+            document.getElementById('btn-2').innerText = t.groupNames[1];
+            document.getElementById('btn-3').innerText = t.groupNames[2];
+            document.getElementById('btn-4').innerText = t.groupNames[3];
+
+            // 4. Switch Screen
+            document.getElementById('langScreen').style.display = 'none';
+            document.getElementById('introScreen').style.display = 'flex';
+        }
+
+        // =====================================
+        // 2. SELECTION LOGIC
+        // =====================================
         function selectTeams(n) {
             numTeams = n;
-            // Update UI
             const btns = document.querySelectorAll('.team-select-grid .team-btn');
             btns.forEach((b, i) => {
                 if (i + 1 === n) b.classList.add('selected');
@@ -435,14 +348,15 @@
                 selectedGroups.add(id);
                 btn.classList.add('selected');
             }
-            // Update Start Button
+            
             const startBtn = document.getElementById('startBtn');
+            const t = translations[currentLang];
             startBtn.disabled = (selectedGroups.size === 0);
-            startBtn.innerText = selectedGroups.size > 0 ? "ابدأ المسابقة" : "اختر مجموعة";
+            startBtn.innerText = selectedGroups.size > 0 ? t.start : t.selectGroup;
         }
 
         function confirmStart() {
-            // Filter Questions
+            // Filter
             currentQuestions = allQuestions.filter(q => {
                 let g = 0;
                 if (q.id <= 25) g = 1;
@@ -454,23 +368,24 @@
 
             if(currentQuestions.length === 0) return;
 
-            // Setup Game State
+            // Init Game
             scores = new Array(numTeams).fill(0);
             currentTeamIndex = 0;
             
-            // Build Scoreboard UI
+            // Build Scoreboard
             const sb = document.getElementById('scoreboard');
             sb.innerHTML = '';
+            const t = translations[currentLang];
             for(let i=0; i<numTeams; i++) {
                 sb.innerHTML += `
                     <div class="team-card" id="team-card-${i}">
-                        <span class="team-name">الفريق ${i+1}</span>
+                        <span class="team-name">${t.team} ${i+1}</span>
                         <span class="team-score" id="score-${i}">0</span>
                     </div>
                 `;
             }
 
-            // Switch Screens
+            // Show Game
             document.getElementById('introScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
             
@@ -479,13 +394,13 @@
         }
 
         function updateTurnUI() {
-            // Highlight active team
             for(let i=0; i<numTeams; i++) {
                 const card = document.getElementById(`team-card-${i}`);
                 if(i === currentTeamIndex) card.classList.add('active-turn');
                 else card.classList.remove('active-turn');
             }
-            document.getElementById('turnMsg').innerText = `دور الفريق ${currentTeamIndex + 1}`;
+            const t = translations[currentLang];
+            document.getElementById('turnMsg').innerText = `${t.turn}: ${t.team} ${currentTeamIndex + 1}`;
         }
 
         function toggleFullScreen() {
@@ -494,7 +409,7 @@
         }
 
         // =====================================
-        // 2. WHEEL LOGIC
+        // 3. WHEEL LOGIC
         // =====================================
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
@@ -512,6 +427,9 @@
             const sliceRad = (sliceDeg * Math.PI) / 180;
             ctx.clearRect(0, 0, size, size);
 
+            // Correct rotation for RTL vs LTR to ensure text isn't upside down if we render text
+            // But we render just numbers.
+            
             for (let i = 0; i < currentQuestions.length; i++) {
                 const q = currentQuestions[i];
                 const startAngle = (i * sliceRad) - (Math.PI / 2);
@@ -523,7 +441,7 @@
                 ctx.fill();
                 ctx.strokeStyle = "#2c3e50"; ctx.lineWidth = 2; ctx.stroke();
                 
-                // Numbers
+                // Render Number
                 if(currentQuestions.length <= 60) {
                     ctx.save();
                     ctx.translate(center, center);
@@ -572,15 +490,13 @@
         }
 
         // =====================================
-        // 3. QUESTION & SCORING
+        // 4. MODAL LOGIC
         // =====================================
         function openQuestion(q) {
-            hasAnsweredCorrectly = false; // Reset for this turn
-            
             const modal = document.getElementById('modal');
-            const levelNames = {1:"سهل",2:"متوسط",3:"صعب",4:"خبير"};
+            const t = translations[currentLang];
             
-            document.getElementById('mLevel').innerText = `المستوى ${q.l} - ${levelNames[q.l]}`;
+            document.getElementById('mLevel').innerText = `${t.levels[q.l]}`;
             document.getElementById('mLevel').style.background = levelColors[q.l];
             document.getElementById('mQuestion').innerText = q.t;
             
@@ -589,7 +505,7 @@
             document.getElementById('mReference').style.display = 'none';
             document.getElementById('closeBtn').style.display = 'none';
 
-            let opts = q.o.map((t, i) => ({ t: t, c: (i === q.c) }));
+            let opts = q.o.map((txt, i) => ({ t: txt, c: (i === q.c) }));
             // Shuffle
             for (let i = opts.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -613,64 +529,53 @@
 
             if(isCorrect) {
                 playWin();
-                btn.style.background = "#2ecc71"; btn.style.color = "white";
-                // Add Score (1 point per correct answer)
+                btn.style.background = "#2ecc71"; btn.style.color = "white"; btn.style.borderColor = "#27ae60";
                 scores[currentTeamIndex]++;
                 document.getElementById(`score-${currentTeamIndex}`).innerText = scores[currentTeamIndex];
-                hasAnsweredCorrectly = true;
             } else {
                 playLoss();
-                btn.style.background = "#e74c3c"; btn.style.color = "white";
-                // Highlight correct
-                // Find correct button logic needed if we want to highlight it, 
-                // but shuffling makes it tricky without data attr. 
-                // Simplified: Just show reference.
+                btn.style.background = "#e74c3c"; btn.style.color = "white"; btn.style.borderColor = "#c0392b";
             }
 
             const refBox = document.getElementById('mReference');
-            refBox.innerHTML = `<strong>الشاهد:</strong><br>${ref}`;
+            const t = translations[currentLang];
+            refBox.innerHTML = `<strong>${t.ref}</strong><br>${ref}`;
             refBox.style.display = 'block';
             document.getElementById('closeBtn').style.display = 'inline-block';
         }
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
-            
-            // Remove question
             if (selectedIndex !== -1) {
                 currentQuestions.splice(selectedIndex, 1);
                 selectedIndex = -1;
             }
-
-            // Switch Turn
             currentTeamIndex++;
             if(currentTeamIndex >= numTeams) currentTeamIndex = 0;
-            
             updateTurnUI();
             drawWheel();
         }
 
         // =====================================
-        // 4. GAME OVER
+        // 5. GAME OVER
         // =====================================
         function showGameOver() {
             const modal = document.getElementById('gameOverModal');
             const list = document.getElementById('rankList');
             list.innerHTML = "";
+            const t = translations[currentLang];
 
-            // Create array of {id, score}
             let ranking = scores.map((s, i) => ({ id: i+1, score: s }));
-            // Sort Descending
             ranking.sort((a, b) => b.score - a.score);
 
-            document.getElementById('winnerName').innerText = `🎉 الفائز: الفريق ${ranking[0].id} 🎉`;
+            document.getElementById('winnerName').innerText = `🎉 ${t.winner}: ${t.team} ${ranking[0].id} 🎉`;
 
             ranking.forEach((r, idx) => {
                 let badge = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : ""));
                 list.innerHTML += `
                     <li class="rank-item">
-                        <span>${badge} الفريق ${r.id}</span>
-                        <span>${r.score} نقطة</span>
+                        <span>${badge} ${t.team} ${r.id}</span>
+                        <span>${r.score}</span>
                     </li>
                 `;
             });
@@ -680,7 +585,7 @@
         }
 
         // =====================================
-        // 5. AUDIO
+        // 6. AUDIO
         // =====================================
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
