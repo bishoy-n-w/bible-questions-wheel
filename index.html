@@ -1,0 +1,269 @@
+<div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <span class="level-badge" id="mLevel">المستوى</span>
+            <div class="question-text" id="mQuestion">...</div>
+            <div class="options-grid" id="mOptions"></div>
+            <div class="reference-box" id="mReference"></div>
+            <button class="close-btn" id="closeBtn" onclick="closeModal()">استمر</button>
+        </div>
+    </div>
+
+    <script src="rawData.js"></script>
+
+    <script>
+        // =====================================
+        // 0. AUDIO ENGINE (Lazy Load)
+        // =====================================
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(freq, type, duration, volume=0.1) {
+            if(!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playTick() { playTone(300, 'square', 0.05, 0.05); }
+
+        function playWin() {
+            playTone(523.25, 'sine', 0.4, 0.2); 
+            setTimeout(() => playTone(659.25, 'sine', 0.4, 0.2), 100); 
+            setTimeout(() => playTone(783.99, 'sine', 0.6, 0.2), 200); 
+            setTimeout(() => playTone(1046.50, 'sine', 1.0, 0.1), 300); 
+        }
+
+        function playLoss() {
+            if(!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // =====================================
+        // 1. DATA LOADING
+        // =====================================
+        
+        // Ensure rawData exists before parsing
+        let questions = [];
+        if (typeof rawData !== 'undefined') {
+            questions = JSON.parse(JSON.stringify(rawData));
+        } else {
+            alert("Error: rawData.js not loaded or variable 'rawData' not found.");
+        }
+        
+        const levelColors = { 1: "#2ecc71", 2: "#f1c40f", 3: "#e67e22", 4: "#e74c3c" };
+
+        // =====================================
+        // 2. WHEEL LOGIC
+        // =====================================
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const size = 1000; 
+        const center = size / 2;
+        const radius = size / 2 - 20;
+        
+        let currentDeg = 0;
+        let selectedIndex = -1;
+
+        function drawWheel() {
+            if (questions.length === 0) {
+                ctx.clearRect(0, 0, size, size);
+                ctx.font = "bold 80px Arial";
+                ctx.fillStyle = "white";
+                ctx.textAlign = "center";
+                ctx.fillText("تم الانتهاء!", center, center);
+                document.getElementById('statusMsg').innerText = "تمت الإجابة على جميع الأسئلة";
+                return;
+            }
+
+            const sliceDeg = 360 / questions.length;
+            const sliceRad = (sliceDeg * Math.PI) / 180;
+
+            ctx.clearRect(0, 0, size, size);
+
+            for (let i = 0; i < questions.length; i++) {
+                const q = questions[i];
+                const startAngle = (i * sliceRad) - (Math.PI / 2);
+                const endAngle = startAngle + sliceRad;
+
+                ctx.beginPath();
+                ctx.moveTo(center, center);
+                ctx.arc(center, center, radius, startAngle, endAngle);
+                ctx.closePath();
+
+                ctx.fillStyle = levelColors[q.l];
+                ctx.fill();
+
+                ctx.strokeStyle = "#2c3e50"; 
+                ctx.lineWidth = 2; 
+                ctx.stroke();
+                
+                if(questions.length <= 60) {
+                    ctx.save();
+                    ctx.translate(center, center);
+                    ctx.rotate(startAngle + sliceRad / 2);
+                    ctx.textAlign = "right";
+                    ctx.fillStyle = "#fff";
+                    ctx.font = "bold 24px Arial";
+                    ctx.fillText(q.id, radius - 30, 10);
+                    ctx.restore();
+                }
+            }
+            document.getElementById('statusMsg').innerText = `عدد الأسئلة المتبقية: ${questions.length}`;
+        }
+
+        function spin() {
+            if (questions.length === 0) return;
+            initAudio();
+            document.getElementById('spinBtn').disabled = true;
+            
+            const winnerIdx = Math.floor(Math.random() * questions.length);
+            const winner = questions[winnerIdx];
+            selectedIndex = winnerIdx;
+
+            const sliceDeg = 360 / questions.length;
+            const targetDeg = (winnerIdx * sliceDeg); 
+            const randomOffset = (Math.random() * sliceDeg * 0.8) - (sliceDeg * 0.4);
+
+            const dest = (360 - targetDeg);
+            const minSpin = currentDeg + 1800; 
+            const remainder = minSpin % 360;
+            const distToDest = (dest - remainder + 360) % 360;
+            const totalDeg = minSpin + distToDest + randomOffset;
+
+            canvas.style.transform = `rotate(${totalDeg}deg)`;
+            currentDeg = totalDeg;
+
+            let duration = 4000;
+            let start = Date.now();
+            function scheduleTick(delay) {
+                if(Date.now() - start > duration) return;
+                playTick();
+                let progress = (Date.now() - start) / duration;
+                let nextDelay = 50 + (progress * 400); 
+                setTimeout(() => scheduleTick(nextDelay), nextDelay);
+            }
+            scheduleTick(50);
+
+            setTimeout(() => {
+                openQuestion(winner); 
+                document.getElementById('spinBtn').disabled = false;
+            }, 4000);
+        }
+
+        // =====================================
+        // 3. UI LOGIC
+        // =====================================
+        function openQuestion(q) {
+            const modal = document.getElementById('modal');
+            const levelNames = {1: "سهل", 2: "متوسط", 3: "صعب", 4: "خبير"};
+            
+            document.getElementById('mLevel').innerText = `المستوى ${q.l} - ${levelNames[q.l]}`;
+            document.getElementById('mLevel').style.background = levelColors[q.l];
+            document.getElementById('mQuestion').innerText = q.t;
+
+            const optDiv = document.getElementById('mOptions');
+            optDiv.innerHTML = ""; 
+            
+            document.getElementById('mReference').style.display = 'none';
+            document.getElementById('closeBtn').style.display = 'none';
+
+            let optionsWithData = q.o.map((text, index) => {
+                return {
+                    text: text,
+                    isCorrect: (index === q.c)
+                };
+            });
+
+            for (let i = optionsWithData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [optionsWithData[i], optionsWithData[j]] = [optionsWithData[j], optionsWithData[i]];
+            }
+
+            optionsWithData.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "opt-btn";
+                btn.innerText = opt.text;
+                if(opt.isCorrect) btn.dataset.correct = "true";
+                btn.onclick = function() { handleAnswer(btn, q.r); };
+                optDiv.appendChild(btn);
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function handleAnswer(clickedBtn, referenceText) {
+            const allBtns = document.querySelectorAll('.opt-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            const isCorrect = clickedBtn.dataset.correct === "true";
+
+            if(isCorrect) {
+                playWin();
+                clickedBtn.style.background = "#2ecc71";
+                clickedBtn.style.color = "white";
+                clickedBtn.style.borderColor = "#27ae60";
+            } else {
+                playLoss();
+                clickedBtn.style.background = "#e74c3c";
+                clickedBtn.style.color = "white";
+                clickedBtn.style.borderColor = "#c0392b";
+                
+                const correctBtn = document.querySelector('button[data-correct="true"]');
+                if(correctBtn) {
+                    correctBtn.style.background = "#2ecc71"; 
+                    correctBtn.style.color = "white";
+                }
+            }
+
+            const refBox = document.getElementById('mReference');
+            refBox.innerHTML = `<strong>الشاهد:</strong><br>${referenceText}`;
+            refBox.style.display = 'block';
+            document.getElementById('closeBtn').style.display = 'inline-block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            if (selectedIndex !== -1) {
+                questions.splice(selectedIndex, 1);
+                selectedIndex = -1;
+                drawWheel();
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(e => console.log(e));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        window.onload = drawWheel;
+    </script>
+</body>
+</html>
