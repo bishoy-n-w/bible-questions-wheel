@@ -2,92 +2,172 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>عجلة الحظ الكتابية</title>
     <style>
+        :root {
+            --bg-color: #2c3e50;
+            --text-color: white;
+            --accent-color: #f1c40f;
+            --btn-hover: #f39c12;
+            --wheel-border: #ecf0f1;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #2c3e50;
-            color: white;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            overflow: hidden; /* Prevent scrolling during spin */
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ====================
+           INTRO SCREEN
+           ==================== */
+        #introScreen {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            z-index: 50;
+            background: var(--bg-color);
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
         }
 
-        /* Wheel Container */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        p.subtitle {
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+            color: #bdc3c7;
+        }
+
+        .group-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .group-btn {
+            background: white;
+            color: var(--bg-color);
+            border: none;
+            padding: 20px;
+            font-size: 1.2rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .group-btn:hover {
+            transform: translateY(-3px);
+            background: var(--wheel-border);
+        }
+
+        .group-btn.full-width {
+            grid-column: span 2;
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        /* ====================
+           GAME SCREEN
+           ==================== */
+        #gameScreen {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
         .wheel-container {
             position: relative;
-            width: 80vmin;
-            height: 80vmin;
+            width: 85vmin; /* Responsive to viewport */
+            height: 85vmin;
             max-width: 600px;
             max-height: 600px;
             margin-bottom: 20px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
         }
 
         canvas {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0s; /* Controlled by JS */
+            transition: transform 0s;
         }
 
-        /* The Pointer Arrow */
         .pointer {
             position: absolute;
-            top: -20px;
+            top: -25px;
             left: 50%;
             transform: translateX(-50%);
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             background: #e74c3c;
             clip-path: polygon(50% 100%, 0 0, 100% 0);
             z-index: 10;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));
         }
 
-        /* Controls */
         .controls {
             display: flex;
+            flex-direction: column;
+            align-items: center;
             gap: 15px;
             z-index: 20;
         }
 
-        button.main-btn {
-            padding: 15px 40px;
+        button.spin-btn {
+            padding: 15px 50px;
             font-size: 1.5rem;
             border: none;
             border-radius: 50px;
-            background: #f1c40f;
-            color: #2c3e50;
+            background: var(--accent-color);
+            color: var(--bg-color);
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: transform 0.2s, background 0.2s;
+            transition: transform 0.2s;
         }
 
-        button.main-btn:hover {
-            transform: scale(1.05);
-            background: #f39c12;
-        }
+        button.spin-btn:active { transform: scale(0.95); }
+        button.spin-btn:disabled { background: #95a5a6; cursor: not-allowed; }
 
-        button.main-btn:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-            transform: none;
+        .back-btn {
+            background: transparent;
+            border: 1px solid #7f8c8d;
+            color: #bdc3c7;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.9rem;
         }
+        .back-btn:hover { background: rgba(255,255,255,0.1); color: white;}
 
-        #statusMsg {
-            margin-top: 15px;
-            font-size: 1.1rem;
-            color: #ecf0f1;
-        }
-
-        /* Modal Styles */
+        /* ====================
+           MODAL (POPUP)
+           ==================== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -97,38 +177,26 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(5px);
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .modal-box {
             background: white;
-            color: #2c3e50;
-            padding: 30px;
+            color: var(--bg-color);
+            padding: 25px;
             border-radius: 20px;
-            width: 90%;
+            width: 100%;
             max-width: 500px;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.5); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .level-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 15px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
+            max-height: 90vh;
+            overflow-y: auto; /* Scroll if content is too long on mobile */
         }
 
         .question-text {
-            font-size: 1.6rem;
-            margin-bottom: 25px;
+            font-size: 1.4rem;
+            margin: 20px 0;
             font-weight: bold;
             line-height: 1.4;
         }
@@ -139,70 +207,102 @@
             gap: 10px;
             margin-bottom: 20px;
         }
-
+        
         .opt-btn {
-            padding: 15px;
+            padding: 12px;
             border: 2px solid #bdc3c7;
             background: white;
             border-radius: 10px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
-            color: #2c3e50;
-        }
-
-        .opt-btn:hover:not(:disabled) {
-            background: #ecf0f1;
-            border-color: #34495e;
+            color: var(--bg-color);
+            font-weight: 600;
         }
 
         .reference-box {
             display: none;
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 15px;
             background: #f8f9fa;
             border-right: 5px solid #2ecc71;
             text-align: right;
             border-radius: 5px;
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
         .close-btn {
             display: none;
-            margin-top: 20px;
+            margin-top: 15px;
             padding: 10px 30px;
-            background: #34495e;
+            background: var(--bg-color);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
         }
 
-        /* Mobile adjustments */
-        @media (max-width: 600px) {
+        /* ====================
+           RESPONSIVE DESIGN
+           ==================== */
+        
+        /* Mobile Landscape (Turn phone sideways) */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #gameScreen {
+                flex-direction: row; /* Side by side layout */
+                gap: 40px;
+            }
+            .wheel-container {
+                height: 90vh;
+                width: 90vh;
+                margin-bottom: 0;
+            }
+            .controls {
+                align-items: flex-start;
+            }
+            h1 { font-size: 1.8rem; }
+        }
+
+        /* Small Phones Portrait */
+        @media (max-width: 400px) {
             .options-grid { grid-template-columns: 1fr; }
-            .question-text { font-size: 1.3rem; }
+            .question-text { font-size: 1.2rem; }
+            h1 { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="wheel-container">
-        <div class="pointer"></div>
-        <canvas id="wheelCanvas" width="1000" height="1000"></canvas>
+    <div id="introScreen">
+        <h1>مسابقة الكتاب المقدس</h1>
+        <p class="subtitle">اختر مجموعة الأسئلة للبدء</p>
+        
+        <div class="group-grid">
+            <button class="group-btn" onclick="startGame(1)">المجموعة 1<br><span style="font-size:0.8em; opacity:0.7">(1-25)</span></button>
+            <button class="group-btn" onclick="startGame(2)">المجموعة 2<br><span style="font-size:0.8em; opacity:0.7">(26-50)</span></button>
+            <button class="group-btn" onclick="startGame(3)">المجموعة 3<br><span style="font-size:0.8em; opacity:0.7">(51-75)</span></button>
+            <button class="group-btn" onclick="startGame(4)">المجموعة 4<br><span style="font-size:0.8em; opacity:0.7">(76-100)</span></button>
+            <button class="group-btn full-width" onclick="startGame('all')">كل المجموعات (100 سؤال)</button>
+        </div>
     </div>
 
-    <div class="controls">
-        <button class="main-btn" id="spinBtn" onclick="spin()">دوّر العجلة!</button>
+    <div id="gameScreen">
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <canvas id="wheelCanvas" width="1000" height="1000"></canvas>
+        </div>
+
+        <div class="controls">
+            <button class="spin-btn" id="spinBtn" onclick="spin()">دوّر العجلة!</button>
+            <div id="statusMsg" style="color:#ecf0f1"></div>
+            <button class="back-btn" onclick="location.reload()">↺ العودة للقائمة</button>
+        </div>
     </div>
-    <div id="statusMsg">جاري تحميل الأسئلة...</div>
-    <button onclick="toggleFullScreen()" style="background:transparent; border:none; color:#7f8c8d; margin-top:20px; cursor:pointer;">
-        [ ملء الشاشة ]
-    </button>
 
     <div class="modal-overlay" id="modal">
         <div class="modal-box">
-            <span class="level-badge" id="mLevel">المستوى</span>
+            <span id="mLevel" style="padding: 5px 12px; border-radius: 12px; color: white; font-size: 0.8rem;"></span>
             <div class="question-text" id="mQuestion">...</div>
             <div class="options-grid" id="mOptions"></div>
             <div class="reference-box" id="mReference"></div>
@@ -214,68 +314,51 @@
 
     <script>
         // =====================================
-        // 0. AUDIO ENGINE
+        // GLOBAL VARIABLES
         // =====================================
+        let allQuestions = [];
+        let currentQuestions = [];
         let audioCtx = null;
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        function playTone(freq, type, duration, volume=0.1) {
-            if(!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-        }
-
-        function playTick() { playTone(300, 'square', 0.05, 0.05); }
-
-        function playWin() {
-            playTone(523.25, 'sine', 0.4, 0.2); 
-            setTimeout(() => playTone(659.25, 'sine', 0.4, 0.2), 100); 
-            setTimeout(() => playTone(783.99, 'sine', 0.6, 0.2), 200); 
-            setTimeout(() => playTone(1046.50, 'sine', 1.0, 0.1), 300); 
-        }
-
-        function playLoss() {
-            if(!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.5);
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.5);
-        }
-
-        // =====================================
-        // 1. DATA LOADING
-        // =====================================
-        let questions = [];
-        if (typeof rawData !== 'undefined') {
-            questions = JSON.parse(JSON.stringify(rawData));
-        } else {
-            alert("خطأ: لم يتم تحميل ملف الأسئلة rawData.js بشكل صحيح.");
-        }
         
         const levelColors = { 1: "#2ecc71", 2: "#f1c40f", 3: "#e67e22", 4: "#e74c3c" };
+
+        // =====================================
+        // 1. INITIALIZATION & GROUP SELECTION
+        // =====================================
+        window.onload = function() {
+            if (typeof rawData !== 'undefined') {
+                allQuestions = JSON.parse(JSON.stringify(rawData));
+            } else {
+                alert("خطأ: لم يتم العثور على ملف الأسئلة rawData.js");
+            }
+        };
+
+        function startGame(group) {
+            // Filter questions based on selection
+            if (group === 'all') {
+                currentQuestions = [...allQuestions];
+            } else if (group === 1) {
+                currentQuestions = allQuestions.filter(q => q.id >= 1 && q.id <= 25);
+            } else if (group === 2) {
+                currentQuestions = allQuestions.filter(q => q.id >= 26 && q.id <= 50);
+            } else if (group === 3) {
+                currentQuestions = allQuestions.filter(q => q.id >= 51 && q.id <= 75);
+            } else if (group === 4) {
+                currentQuestions = allQuestions.filter(q => q.id >= 76 && q.id <= 100);
+            }
+
+            if(currentQuestions.length === 0) {
+                alert("لا توجد أسئلة في هذه المجموعة!");
+                return;
+            }
+
+            // Switch UI
+            document.getElementById('introScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'flex';
+            
+            // Draw Wheel
+            drawWheel();
+        }
 
         // =====================================
         // 2. WHEEL LOGIC
@@ -290,24 +373,24 @@
         let selectedIndex = -1;
 
         function drawWheel() {
-            if (questions.length === 0) {
+            if (currentQuestions.length === 0) {
                 ctx.clearRect(0, 0, size, size);
-                ctx.font = "bold 80px Arial";
+                ctx.font = "bold 80px Segoe UI";
                 ctx.fillStyle = "white";
                 ctx.textAlign = "center";
-                ctx.fillText("تم الانتهاء!", center, center);
+                ctx.fillText("النهاية!", center, center);
                 document.getElementById('statusMsg').innerText = "تمت الإجابة على جميع الأسئلة";
                 document.getElementById('spinBtn').disabled = true;
                 return;
             }
 
-            const sliceDeg = 360 / questions.length;
+            const sliceDeg = 360 / currentQuestions.length;
             const sliceRad = (sliceDeg * Math.PI) / 180;
 
             ctx.clearRect(0, 0, size, size);
 
-            for (let i = 0; i < questions.length; i++) {
-                const q = questions[i];
+            for (let i = 0; i < currentQuestions.length; i++) {
+                const q = currentQuestions[i];
                 const startAngle = (i * sliceRad) - (Math.PI / 2);
                 const endAngle = startAngle + sliceRad;
 
@@ -323,30 +406,33 @@
                 ctx.lineWidth = 2; 
                 ctx.stroke();
                 
-                if(questions.length <= 60) {
+                // Show numbers if not too crowded
+                if(currentQuestions.length <= 60) {
                     ctx.save();
                     ctx.translate(center, center);
                     ctx.rotate(startAngle + sliceRad / 2);
                     ctx.textAlign = "right";
-                    ctx.fillStyle = "#fff";
+                    ctx.fillStyle = "rgba(0,0,0,0.5)"; // Shadow
                     ctx.font = "bold 24px Arial";
+                    ctx.fillText(q.id, radius - 28, 12);
+                    ctx.fillStyle = "#fff"; // Text
                     ctx.fillText(q.id, radius - 30, 10);
                     ctx.restore();
                 }
             }
-            document.getElementById('statusMsg').innerText = `عدد الأسئلة المتبقية: ${questions.length}`;
+            document.getElementById('statusMsg').innerText = `المتبقي: ${currentQuestions.length} سؤال`;
         }
 
         function spin() {
-            if (questions.length === 0) return;
+            if (currentQuestions.length === 0) return;
             initAudio();
             document.getElementById('spinBtn').disabled = true;
             
-            const winnerIdx = Math.floor(Math.random() * questions.length);
-            const winner = questions[winnerIdx];
+            const winnerIdx = Math.floor(Math.random() * currentQuestions.length);
+            const winner = currentQuestions[winnerIdx];
             selectedIndex = winnerIdx;
 
-            const sliceDeg = 360 / questions.length;
+            const sliceDeg = 360 / currentQuestions.length;
             const targetDeg = (winnerIdx * sliceDeg); 
             const randomOffset = (Math.random() * sliceDeg * 0.8) - (sliceDeg * 0.4);
 
@@ -366,10 +452,8 @@
             function scheduleTick() {
                 let now = Date.now();
                 if(now - start > duration) return;
-                
                 let progress = (now - start) / duration;
                 let delay = 50 + (progress * progress * 500); 
-                
                 playTick();
                 setTimeout(scheduleTick, delay);
             }
@@ -382,14 +466,16 @@
         }
 
         // =====================================
-        // 3. UI LOGIC
+        // 3. UI & GAME LOGIC
         // =====================================
         function openQuestion(q) {
             const modal = document.getElementById('modal');
             const levelNames = {1: "سهل", 2: "متوسط", 3: "صعب", 4: "خبير"};
             
-            document.getElementById('mLevel').innerText = `المستوى ${q.l} - ${levelNames[q.l]}`;
-            document.getElementById('mLevel').style.background = levelColors[q.l];
+            const lbl = document.getElementById('mLevel');
+            lbl.innerText = `المستوى ${q.l} - ${levelNames[q.l]}`;
+            lbl.style.background = levelColors[q.l];
+            
             document.getElementById('mQuestion').innerText = q.t;
 
             const optDiv = document.getElementById('mOptions');
@@ -399,10 +485,7 @@
             document.getElementById('closeBtn').style.display = 'none';
 
             let optionsWithData = q.o.map((text, index) => {
-                return {
-                    text: text,
-                    isCorrect: (index === q.c)
-                };
+                return { text: text, isCorrect: (index === q.c) };
             });
 
             // Shuffle options
@@ -455,22 +538,63 @@
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
+            // Remove question from current set
             if (selectedIndex !== -1) {
-                questions.splice(selectedIndex, 1);
+                currentQuestions.splice(selectedIndex, 1);
                 selectedIndex = -1;
                 drawWheel();
             }
         }
 
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(e => console.log(e));
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
+        // =====================================
+        // 4. AUDIO ENGINE
+        // =====================================
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
             }
         }
 
-        window.onload = drawWheel;
+        function playTone(freq, type, duration, volume=0.1) {
+            if(!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playTick() { playTone(300, 'square', 0.05, 0.05); }
+
+        function playWin() {
+            playTone(523.25, 'sine', 0.4, 0.2); 
+            setTimeout(() => playTone(659.25, 'sine', 0.4, 0.2), 100); 
+            setTimeout(() => playTone(783.99, 'sine', 0.6, 0.2), 200); 
+            setTimeout(() => playTone(1046.50, 'sine', 1.0, 0.1), 300); 
+        }
+
+        function playLoss() {
+            if(!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
     </script>
 </body>
 </html>
