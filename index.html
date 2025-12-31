@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bible Wheel Game</title>
+    <title>Bible Wheel - Multi Language</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -12,7 +12,7 @@
             --btn-hover: #f39c12;
             --wheel-border: #ecf0f1;
             --selected-color: #2ecc71;
-            --team-active: #e74c3c;
+            --card-bg: rgba(255,255,255,0.1);
         }
 
         body {
@@ -32,7 +32,7 @@
         .fullscreen-btn {
             position: fixed;
             top: 20px;
-            left: 20px; /* Will flip in RTL */
+            right: 20px;
             background: rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
@@ -44,8 +44,6 @@
             z-index: 1000;
             font-size: 1.2rem;
         }
-        [dir="rtl"] .fullscreen-btn { left: 20px; right: auto; }
-        [dir="ltr"] .fullscreen-btn { right: 20px; left: auto; }
 
         /* --- Screens --- */
         .screen {
@@ -62,82 +60,118 @@
         }
 
         /* --- 1. Language Screen --- */
-        #langScreen { display: flex; } /* Initial Screen */
+        #langScreen { display: flex; }
         
-        .lang-btn {
-            background: white;
-            color: var(--bg-color);
-            border: none;
-            padding: 20px 40px;
-            margin: 10px;
-            font-size: 1.5rem;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 80%;
-            max-width: 300px;
-            font-weight: bold;
-            transition: transform 0.2s;
+        .lang-grid {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
-        .lang-btn:hover { transform: scale(1.05); background: var(--accent-color); color: white; }
 
-        /* --- 2. Intro Screen --- */
-        h1 { font-size: 2rem; margin-bottom: 5px; color: var(--accent-color); text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .section-title { margin-top: 20px; margin-bottom: 10px; font-size: 1.1rem; color: #bdc3c7; border-bottom: 1px solid #7f8c8d; padding-bottom: 5px; width: 100%; max-width: 400px; }
+        .lang-toggle {
+            background: transparent;
+            border: 2px solid #7f8c8d;
+            color: #bdc3c7;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 120px;
+        }
         
-        .team-select-grid { display: flex; gap: 10px; margin-bottom: 20px; }
-        .team-btn { background: transparent; border: 2px solid #7f8c8d; color: #bdc3c7; width: 50px; height: 50px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; }
+        .lang-toggle.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            border-color: var(--accent-color);
+            font-weight: bold;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+        }
+
+        /* --- 2. Intro Screen (Shared Styles) --- */
+        h1 { font-size: 1.8rem; margin-bottom: 5px; color: var(--accent-color); text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .section-title { margin-top: 15px; margin-bottom: 10px; font-size: 1rem; color: #bdc3c7; border-bottom: 1px solid #7f8c8d; padding-bottom: 5px; width: 100%; max-width: 400px; }
+        
+        .team-select-grid { display: flex; gap: 10px; margin-bottom: 15px; }
+        .team-btn { background: transparent; border: 2px solid #7f8c8d; color: #bdc3c7; width: 45px; height: 45px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; transition: all 0.2s; }
         .team-btn.selected { background: var(--accent-color); color: var(--bg-color); border-color: var(--accent-color); font-weight: bold; transform: scale(1.1); }
 
-        .group-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 500px; margin-bottom: 25px; }
-        .group-btn { background: white; color: var(--bg-color); border: 3px solid transparent; padding: 12px; font-size: 1rem; border-radius: 12px; cursor: pointer; font-weight: bold; opacity: 0.8; transition: all 0.2s; }
+        .group-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 500px; margin-bottom: 20px; }
+        .group-btn { background: white; color: var(--bg-color); border: 3px solid transparent; padding: 10px; font-size: 1rem; border-radius: 10px; cursor: pointer; font-weight: bold; opacity: 0.8; transition: all 0.2s; }
         .group-btn:hover { opacity: 1; transform: translateY(-2px); }
         .group-btn.selected { border-color: var(--selected-color); background: #e8f8f5; color: #27ae60; opacity: 1; }
 
-        .start-game-btn { background: var(--accent-color); color: var(--bg-color); border: none; padding: 15px 60px; font-size: 1.5rem; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; }
-        .start-game-btn:disabled { background: #7f8c8d; cursor: not-allowed; opacity: 0.5; }
+        .action-btn { background: var(--accent-color); color: var(--bg-color); border: none; padding: 15px 50px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; margin-top: 10px;}
+        .action-btn:disabled { background: #7f8c8d; cursor: not-allowed; opacity: 0.5; }
 
         /* --- 3. Game Screen --- */
         #gameScreen { position: relative; }
         .scoreboard { position: absolute; top: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 10px 5px; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); z-index: 30; box-sizing: border-box; }
-        .team-card { background: rgba(255,255,255,0.1); border-radius: 10px; padding: 5px 10px; text-align: center; border: 2px solid transparent; transition: all 0.3s; flex: 1; margin: 0 5px; max-width: 100px; }
-        .team-card.active-turn { background: white; color: var(--bg-color); border-color: var(--accent-color); transform: scale(1.05); box-shadow: 0 0 15px rgba(241, 196, 15, 0.5); }
-        .team-name { font-size: 0.8rem; display: block; }
-        .team-score { font-size: 1.2rem; font-weight: bold; }
+        .team-card { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 5px; text-align: center; border: 2px solid transparent; transition: all 0.3s; flex: 1; margin: 0 4px; max-width: 90px; }
+        .team-card.active-turn { background: white; color: var(--bg-color); border-color: var(--accent-color); transform: scale(1.05); box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
+        .team-name { font-size: 0.75rem; display: block; }
+        .team-score { font-size: 1.1rem; font-weight: bold; }
 
         .wheel-container { position: relative; width: 75vmin; height: 75vmin; max-width: 500px; max-height: 500px; margin-top: 60px; margin-bottom: 10px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); }
         canvas { width: 100%; height: 100%; border-radius: 50%; }
-        .pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; }
+        .pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; }
 
         .controls { display: flex; flex-direction: column; align-items: center; z-index: 20; }
-        button.spin-btn { padding: 12px 40px; font-size: 1.3rem; border: none; border-radius: 50px; background: var(--accent-color); color: var(--bg-color); font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        button.spin-btn:disabled { background: #95a5a6; }
-
-        /* --- Modal --- */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: white; color: var(--bg-color); padding: 25px; border-radius: 20px; width: 100%; max-width: 500px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
-        .question-text { font-size: 1.4rem; margin: 20px 0; font-weight: bold; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .opt-btn { padding: 12px; border: 2px solid #bdc3c7; background: white; border-radius: 10px; font-size: 1rem; cursor: pointer; color: var(--bg-color); }
-        .reference-box { display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-right: 5px solid #2ecc71; text-align: right; }
-        [dir="ltr"] .reference-box { border-right: none; border-left: 5px solid #2ecc71; text-align: left; }
         
-        .action-btn { width:auto; height:auto; padding:10px 30px; background:#2c3e50; color:white; border:none; border-radius:10px; margin-top:15px; cursor: pointer; font-size: 1rem; }
+        /* --- Modal (Multi-Language Support) --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+        .modal-box { background: white; color: var(--bg-color); padding: 20px; border-radius: 15px; width: 100%; max-width: 600px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
+        
+        /* Question Block */
+        .q-container { margin: 15px 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; }
+        .q-text-item { font-size: 1.2rem; margin: 8px 0; line-height: 1.4; font-weight: bold; }
+        .q-text-item:not(:last-child) { border-bottom: 1px dashed #bdc3c7; padding-bottom: 8px; }
+        .q-text-item[lang="ar"] { font-family: 'Segoe UI', Tahoma; font-size: 1.3rem; }
+        
+        /* Options Block */
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; }
+        .opt-btn { 
+            padding: 10px; 
+            border: 2px solid #bdc3c7; 
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            color: var(--bg-color); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+        .opt-subtext { font-size: 0.9rem; margin: 2px 0; width: 100%; }
+        .opt-subtext:not(:last-child) { border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 2px; }
+        
+        .reference-box { display: none; margin-top: 15px; padding: 10px; background: #f8f9fa; border-left: 5px solid #2ecc71; text-align: left; font-size: 0.9rem; }
+        .ref-item { margin-bottom: 8px; }
 
         /* --- Game Over --- */
-        .winner-box { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #2c3e50; padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; animation: popIn 0.5s ease; }
-        .rank-list { list-style: none; padding: 0; margin-top: 20px; text-align: inherit; }
+        .winner-box { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #2c3e50; padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; }
+        .rank-list { list-style: none; padding: 0; margin-top: 20px; text-align: left; }
         .rank-item { background: rgba(255,255,255,0.3); margin: 5px 0; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; }
-        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* Landscape Mobile */
+        /* Landscape Mobile Optimization */
         @media (max-height: 500px) and (orientation: landscape) {
             #gameScreen { flex-direction: row; align-items: center; }
-            .scoreboard { width: 150px; height: 100%; top:0; left:0; flex-direction: column; justify-content: center; }
-            [dir="ltr"] .scoreboard { left: auto; right: 0; }
-            .wheel-container { margin-top: 0; margin-left: 160px; height: 85vmin; width: 85vmin; }
-            [dir="ltr"] .wheel-container { margin-left: 0; margin-right: 160px; }
-            .controls { position: absolute; bottom: 20px; right: 20px; }
-            [dir="ltr"] .controls { right: auto; left: 20px; }
+            .scoreboard { width: 120px; height: 100%; top:0; right:0; left: auto; flex-direction: column; justify-content: center; }
+            .wheel-container { margin: 0; height: 85vmin; width: 85vmin; margin-right: 130px; }
+            .controls { position: absolute; bottom: 10px; left: 20px; }
+            .modal-box { flex-direction: row; max-width: 90vw; text-align: left; }
+            .q-container { width: 50%; border-bottom: none; border-right: 2px solid #ecf0f1; padding-right: 15px; margin-right: 15px; margin-bottom: 0;}
+            .options-grid { width: 50%; }
+        }
+        
+        /* PC Optimization (Larger Screens) */
+        @media (min-width: 768px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+            .q-text-item { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -146,16 +180,22 @@
     <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Toggle Fullscreen">⛶</button>
 
     <div id="langScreen" class="screen">
-        <h1 style="margin-bottom: 40px;">✟ Bible Quiz</h1>
-        <button class="lang-btn" onclick="setLanguage('ar')">العربية</button>
-        <button class="lang-btn" onclick="setLanguage('en')">English</button>
-        <button class="lang-btn" onclick="setLanguage('fr')">Français</button>
+        <h1 style="margin-bottom: 10px;">Bible Quiz</h1>
+        <p style="color:#bdc3c7; margin-bottom:30px;">Select Language(s) / اختر اللغة</p>
+        
+        <div class="lang-grid">
+            <button class="lang-toggle active" id="lang-ar" onclick="toggleLang('ar')">العربية</button>
+            <button class="lang-toggle" id="lang-en" onclick="toggleLang('en')">English</button>
+            <button class="lang-toggle" id="lang-fr" onclick="toggleLang('fr')">Français</button>
+        </div>
+
+        <button class="action-btn" onclick="goToIntro()">Continue ➡</button>
     </div>
 
     <div id="introScreen" class="screen">
-        <h1 id="ui-title">مسابقة الكتاب المقدس</h1>
+        <h1>Settings</h1>
         
-        <div class="section-title" id="ui-teams">عدد الفرق</div>
+        <div class="section-title">Teams / الفرق</div>
         <div class="team-select-grid">
             <button class="team-btn selected" onclick="selectTeams(1)">1</button>
             <button class="team-btn" onclick="selectTeams(2)">2</button>
@@ -163,15 +203,16 @@
             <button class="team-btn" onclick="selectTeams(4)">4</button>
         </div>
 
-        <div class="section-title" id="ui-groups">مجموعة الأسئلة</div>
+        <div class="section-title">Question Group / المجموعة</div>
         <div class="group-grid">
-            <button class="group-btn" id="btn-1" onclick="toggleGroup(1)">1</button>
-            <button class="group-btn" id="btn-2" onclick="toggleGroup(2)">2</button>
-            <button class="group-btn" id="btn-3" onclick="toggleGroup(3)">3</button>
-            <button class="group-btn" id="btn-4" onclick="toggleGroup(4)">4</button>
+            <button class="group-btn" id="btn-1" onclick="toggleGroup(1)">1-25</button>
+            <button class="group-btn" id="btn-2" onclick="toggleGroup(2)">26-50</button>
+            <button class="group-btn" id="btn-3" onclick="toggleGroup(3)">51-75</button>
+            <button class="group-btn" id="btn-4" onclick="toggleGroup(4)">76-100</button>
         </div>
 
-        <button class="start-game-btn" id="startBtn" onclick="confirmStart()" disabled>ابدأ المسابقة</button>
+        <button class="action-btn" id="startBtn" onclick="confirmStart()" disabled>Start Game</button>
+        <button style="background:transparent; border:none; color:#7f8c8d; margin-top:10px; cursor:pointer;" onclick="location.reload()">⬅ Back</button>
     </div>
 
     <div id="gameScreen" class="screen">
@@ -184,27 +225,32 @@
 
         <div class="controls">
             <div id="turnMsg" style="color:var(--accent-color); margin-bottom:10px; font-weight:bold;"></div>
-            <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN!</button>
-            <button class="action-btn" id="endBtn" style="background:transparent; border:1px solid #7f8c8d; color:#bdc3c7; margin-top:10px; padding: 5px 15px;" onclick="location.reload()">End Game</button>
+            <button class="action-btn" id="spinBtn" onclick="spin()">SPIN</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal">
         <div class="modal-box">
-            <span id="mLevel" style="padding: 5px 12px; border-radius: 12px; color: white; font-size: 0.8rem;"></span>
-            <div class="question-text" id="mQuestion">...</div>
-            <div class="options-grid" id="mOptions"></div>
+            <span id="mLevel" style="padding: 3px 10px; border-radius: 12px; color: white; font-size: 0.8rem; align-self:center; margin-bottom:5px;">Level</span>
+            
+            <div class="q-container" id="mQuestionContainer">
+                </div>
+
+            <div class="options-grid" id="mOptions">
+                </div>
+
             <div class="reference-box" id="mReference"></div>
-            <button class="action-btn" id="closeBtn" style="display:none;" onclick="closeModal()">Next</button>
+            
+            <button class="action-btn" id="closeBtn" style="display:none; align-self: center; margin-top:15px; font-size:1rem; padding: 10px 30px;" onclick="closeModal()">Next ➡</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="gameOverModal">
         <div class="winner-box">
-            <h2 style="margin:0; font-size:2rem;" id="ui-results">🏆 Results</h2>
+            <h2 style="margin:0; font-size:2rem;">🏆 Results</h2>
             <div id="winnerName" style="font-size:1.5rem; margin:15px 0; font-weight:bold;"></div>
             <ul class="rank-list" id="rankList"></ul>
-            <button class="action-btn" style="background:white; color:#2c3e50; font-weight:bold; margin-top:20px;" onclick="location.reload()" id="ui-newgame">New Game</button>
+            <button class="action-btn" style="background:white; color:#2c3e50; font-weight:bold; margin-top:20px;" onclick="location.reload()">New Game</button>
         </div>
     </div>
 
@@ -212,71 +258,11 @@
 
     <script>
         // =====================================
-        // TRANSLATION DATA
-        // =====================================
-        const translations = {
-            ar: {
-                title: "مسابقة الكتاب المقدس",
-                teams: "عدد الفرق المتنافسة",
-                groups: "مجموعة الأسئلة",
-                start: "ابدأ المسابقة",
-                selectGroup: "اختر مجموعة",
-                spin: "دوّر العجلة!",
-                end: "خروج",
-                turn: "دور الفريق",
-                team: "الفريق",
-                next: "التالي",
-                ref: "الشاهد:",
-                results: "النتائج النهائية",
-                winner: "الفائز",
-                newgame: "لعبة جديدة",
-                levels: {1:"سهل", 2:"متوسط", 3:"صعب", 4:"خبير"},
-                groupNames: ["المستوى 1 (1-25)", "المستوى 2 (26-50)", "المستوى 3 (51-75)", "المستوى 4 (76-100)"]
-            },
-            en: {
-                title: "Bible Quiz",
-                teams: "Number of Teams",
-                groups: "Question Groups",
-                start: "Start Game",
-                selectGroup: "Select Group",
-                spin: "Spin Wheel!",
-                end: "Exit",
-                turn: "Team Turn:",
-                team: "Team",
-                next: "Next",
-                ref: "Reference:",
-                results: "Final Results",
-                winner: "Winner",
-                newgame: "New Game",
-                levels: {1:"Easy", 2:"Medium", 3:"Hard", 4:"Expert"},
-                groupNames: ["Level 1 (1-25)", "Level 2 (26-50)", "Level 3 (51-75)", "Level 4 (76-100)"]
-            },
-            fr: {
-                title: "Quiz Biblique",
-                teams: "Nombre d'équipes",
-                groups: "Groupes de questions",
-                start: "Commencer",
-                selectGroup: "Choisir un groupe",
-                spin: "Tournez la roue !",
-                end: "Quitter",
-                turn: "Tour de l'équipe",
-                team: "Équipe",
-                next: "Suivant",
-                ref: "Référence:",
-                results: "Résultats finaux",
-                winner: "Gagnant",
-                newgame: "Nouvelle partie",
-                levels: {1:"Facile", 2:"Moyen", 3:"Difficile", 4:"Expert"},
-                groupNames: ["Niveau 1 (1-25)", "Niveau 2 (26-50)", "Niveau 3 (51-75)", "Niveau 4 (76-100)"]
-            }
-        };
-
-        // =====================================
         // STATE
         // =====================================
-        let currentLang = 'ar';
-        let allQuestions = []; // Loaded from gameData based on lang
-        let currentQuestions = [];
+        let selectedLangs = new Set(['ar']); // Default
+        let activeLangArray = []; // Array of lang codes ['ar', 'en']
+        let currentQuestions = []; // IDs only
         let selectedGroups = new Set();
         let numTeams = 1;
         let scores = [0, 0, 0, 0];
@@ -286,54 +272,41 @@
         const levelColors = { 1: "#2ecc71", 2: "#f1c40f", 3: "#e67e22", 4: "#e74c3c" };
 
         // =====================================
-        // 1. LANGUAGE & SETUP
+        // 1. LANGUAGE SELECTION
         // =====================================
-        function setLanguage(lang) {
-            currentLang = lang;
-            
-            // 1. Set Direction
-            const dir = (lang === 'ar') ? 'rtl' : 'ltr';
-            document.documentElement.setAttribute('dir', dir);
-            document.documentElement.setAttribute('lang', lang);
-
-            // 2. Load Data
-            if (typeof gameData !== 'undefined' && gameData[lang]) {
-                allQuestions = JSON.parse(JSON.stringify(gameData[lang]));
+        function toggleLang(lang) {
+            const btn = document.getElementById(`lang-${lang}`);
+            if (selectedLangs.has(lang)) {
+                // Prevent deselecting if it's the last one
+                if (selectedLangs.size > 1) {
+                    selectedLangs.delete(lang);
+                    btn.classList.remove('active');
+                }
             } else {
-                alert("Error: Questions for this language not found in questions.js");
+                selectedLangs.add(lang);
+                btn.classList.add('active');
+            }
+        }
+
+        function goToIntro() {
+            activeLangArray = Array.from(selectedLangs);
+            
+            // Validate Data
+            if (typeof gameData === 'undefined') {
+                alert("Error: questions.js not loaded.");
                 return;
             }
 
-            // 3. Update UI Text
-            const t = translations[lang];
-            document.getElementById('ui-title').innerText = t.title;
-            document.getElementById('ui-teams').innerText = t.teams;
-            document.getElementById('ui-groups').innerText = t.groups;
-            document.getElementById('startBtn').innerText = t.selectGroup; // Initially disabled
-            document.getElementById('spinBtn').innerText = t.spin;
-            document.getElementById('endBtn').innerText = t.end;
-            document.getElementById('closeBtn').innerText = t.next;
-            document.getElementById('ui-results').innerText = t.results;
-            document.getElementById('ui-newgame').innerText = t.newgame;
-
-            // Update Group Buttons Text
-            document.getElementById('btn-1').innerText = t.groupNames[0];
-            document.getElementById('btn-2').innerText = t.groupNames[1];
-            document.getElementById('btn-3').innerText = t.groupNames[2];
-            document.getElementById('btn-4').innerText = t.groupNames[3];
-
-            // 4. Switch Screen
             document.getElementById('langScreen').style.display = 'none';
             document.getElementById('introScreen').style.display = 'flex';
         }
 
         // =====================================
-        // 2. SELECTION LOGIC
+        // 2. TEAM & GROUP SETUP
         // =====================================
         function selectTeams(n) {
             numTeams = n;
-            const btns = document.querySelectorAll('.team-select-grid .team-btn');
-            btns.forEach((b, i) => {
+            document.querySelectorAll('.team-btn').forEach((b, i) => {
                 if (i + 1 === n) b.classList.add('selected');
                 else b.classList.remove('selected');
             });
@@ -348,23 +321,23 @@
                 selectedGroups.add(id);
                 btn.classList.add('selected');
             }
-            
-            const startBtn = document.getElementById('startBtn');
-            const t = translations[currentLang];
-            startBtn.disabled = (selectedGroups.size === 0);
-            startBtn.innerText = selectedGroups.size > 0 ? t.start : t.selectGroup;
+            document.getElementById('startBtn').disabled = (selectedGroups.size === 0);
         }
 
         function confirmStart() {
-            // Filter
-            currentQuestions = allQuestions.filter(q => {
+            // Get valid IDs from the first selected language (assuming all langs have same IDs)
+            const primaryLang = activeLangArray[0];
+            const masterList = gameData[primaryLang];
+
+            // Filter IDs based on groups
+            currentQuestions = masterList.filter(q => {
                 let g = 0;
                 if (q.id <= 25) g = 1;
                 else if (q.id <= 50) g = 2;
                 else if (q.id <= 75) g = 3;
                 else if (q.id <= 100) g = 4;
                 return selectedGroups.has(g);
-            });
+            }).map(q => q.id); // Store ONLY IDs
 
             if(currentQuestions.length === 0) return;
 
@@ -375,17 +348,15 @@
             // Build Scoreboard
             const sb = document.getElementById('scoreboard');
             sb.innerHTML = '';
-            const t = translations[currentLang];
             for(let i=0; i<numTeams; i++) {
                 sb.innerHTML += `
                     <div class="team-card" id="team-card-${i}">
-                        <span class="team-name">${t.team} ${i+1}</span>
+                        <span class="team-name">Team ${i+1}</span>
                         <span class="team-score" id="score-${i}">0</span>
                     </div>
                 `;
             }
 
-            // Show Game
             document.getElementById('introScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
             
@@ -399,13 +370,7 @@
                 if(i === currentTeamIndex) card.classList.add('active-turn');
                 else card.classList.remove('active-turn');
             }
-            const t = translations[currentLang];
-            document.getElementById('turnMsg').innerText = `${t.turn}: ${t.team} ${currentTeamIndex + 1}`;
-        }
-
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e=>{});
-            else if (document.exitFullscreen) document.exitFullscreen();
+            document.getElementById('turnMsg').innerText = `Turn: Team ${currentTeamIndex + 1}`;
         }
 
         // =====================================
@@ -415,7 +380,7 @@
         const ctx = canvas.getContext('2d');
         const size = 1000; const center = size/2; const radius = size/2 - 20;
         let currentDeg = 0;
-        let selectedIndex = -1;
+        let selectedId = -1;
 
         function drawWheel() {
             if (currentQuestions.length === 0) {
@@ -427,17 +392,17 @@
             const sliceRad = (sliceDeg * Math.PI) / 180;
             ctx.clearRect(0, 0, size, size);
 
-            // Correct rotation for RTL vs LTR to ensure text isn't upside down if we render text
-            // But we render just numbers.
-            
             for (let i = 0; i < currentQuestions.length; i++) {
-                const q = currentQuestions[i];
+                // Get Level Color from primary lang data
+                const qId = currentQuestions[i];
+                const qData = gameData[activeLangArray[0]].find(q => q.id === qId);
+                
                 const startAngle = (i * sliceRad) - (Math.PI / 2);
                 ctx.beginPath();
                 ctx.moveTo(center, center);
                 ctx.arc(center, center, radius, startAngle, startAngle + sliceRad);
                 ctx.closePath();
-                ctx.fillStyle = levelColors[q.l];
+                ctx.fillStyle = levelColors[qData.l];
                 ctx.fill();
                 ctx.strokeStyle = "#2c3e50"; ctx.lineWidth = 2; ctx.stroke();
                 
@@ -449,9 +414,9 @@
                     ctx.textAlign = "right";
                     ctx.fillStyle = "rgba(0,0,0,0.5)"; 
                     ctx.font = "bold 24px Arial";
-                    ctx.fillText(q.id, radius - 28, 12);
+                    ctx.fillText(qId, radius - 28, 12);
                     ctx.fillStyle = "#fff"; 
-                    ctx.fillText(q.id, radius - 30, 10);
+                    ctx.fillText(qId, radius - 30, 10);
                     ctx.restore();
                 }
             }
@@ -462,12 +427,11 @@
             initAudio();
             document.getElementById('spinBtn').disabled = true;
             
-            const winnerIdx = Math.floor(Math.random() * currentQuestions.length);
-            const winner = currentQuestions[winnerIdx];
-            selectedIndex = winnerIdx;
+            const randomIdx = Math.floor(Math.random() * currentQuestions.length);
+            selectedId = currentQuestions[randomIdx];
 
             const sliceDeg = 360 / currentQuestions.length;
-            const targetDeg = (winnerIdx * sliceDeg); 
+            const targetDeg = (randomIdx * sliceDeg); 
             const randomOffset = (Math.random() * sliceDeg * 0.8) - (sliceDeg * 0.4);
             const totalDeg = currentDeg + 1800 + (360 - targetDeg - (currentDeg % 360) + 360)%360 + randomOffset;
 
@@ -484,108 +448,163 @@
             tick();
 
             setTimeout(() => {
-                openQuestion(winner); 
+                openMultiLangQuestion(selectedId); 
                 document.getElementById('spinBtn').disabled = false;
             }, 4000);
         }
 
         // =====================================
-        // 4. MODAL LOGIC
+        // 4. MULTI-LANGUAGE MODAL LOGIC
         // =====================================
-        function openQuestion(q) {
+        function openMultiLangQuestion(id) {
             const modal = document.getElementById('modal');
-            const t = translations[currentLang];
-            
-            document.getElementById('mLevel').innerText = `${t.levels[q.l]}`;
-            document.getElementById('mLevel').style.background = levelColors[q.l];
-            document.getElementById('mQuestion').innerText = q.t;
-            
+            const qContainer = document.getElementById('mQuestionContainer');
             const optDiv = document.getElementById('mOptions');
+            const refBox = document.getElementById('mReference');
+            
+            qContainer.innerHTML = "";
             optDiv.innerHTML = "";
-            document.getElementById('mReference').style.display = 'none';
+            refBox.innerHTML = "";
             document.getElementById('closeBtn').style.display = 'none';
+            document.getElementById('mReference').style.display = 'none';
 
-            let opts = q.o.map((txt, i) => ({ t: txt, c: (i === q.c) }));
-            // Shuffle
-            for (let i = opts.length - 1; i > 0; i--) {
+            // 1. Get Data for this ID from all selected languages
+            // Structure: [{lang:'ar', data: {...}}, {lang:'en', data: {...}}]
+            let qSet = activeLangArray.map(lang => {
+                return { 
+                    lang: lang, 
+                    data: gameData[lang].find(q => q.id === id) 
+                };
+            });
+
+            // 2. Set Level Badge (Use first lang)
+            const firstQ = qSet[0].data;
+            document.getElementById('mLevel').innerText = `Level ${firstQ.l}`;
+            document.getElementById('mLevel').style.background = levelColors[firstQ.l];
+
+            // 3. Render Question Texts
+            qSet.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'q-text-item';
+                div.setAttribute('lang', item.lang);
+                div.setAttribute('dir', item.lang === 'ar' ? 'rtl' : 'ltr');
+                div.innerText = item.data.t;
+                qContainer.appendChild(div);
+            });
+
+            // 4. Handle Options
+            // We need to shuffle INDICES [0,1,2,3], not the arrays themselves, 
+            // to keep the languages synchronized.
+            let indices = [0, 1, 2, 3];
+            for (let i = indices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [opts[i], opts[j]] = [opts[j], opts[i]];
+                [indices[i], indices[j]] = [indices[j], indices[i]];
             }
 
-            opts.forEach(opt => {
+            // Create buttons based on shuffled indices
+            indices.forEach(idx => {
                 const btn = document.createElement('button');
                 btn.className = "opt-btn";
-                btn.innerText = opt.t;
-                btn.onclick = () => handleAnswer(btn, opt.c, q.r);
+                
+                // Add text for each language in this button
+                qSet.forEach(item => {
+                    const span = document.createElement('span');
+                    span.className = 'opt-subtext';
+                    span.innerText = item.data.o[idx];
+                    span.setAttribute('dir', item.lang === 'ar' ? 'rtl' : 'ltr');
+                    btn.appendChild(span);
+                });
+
+                // Check correctness (using the first lang is enough as they are synced)
+                // idx is the current index of the option, firstQ.c is the correct index
+                const isCorrect = (idx === firstQ.c);
+                
+                btn.onclick = () => handleAnswer(btn, isCorrect, qSet);
                 optDiv.appendChild(btn);
             });
 
             modal.style.display = 'flex';
         }
 
-        function handleAnswer(btn, isCorrect, ref) {
+        function handleAnswer(btn, isCorrect, qSet) {
             const allBtns = document.querySelectorAll('.opt-btn');
             allBtns.forEach(b => b.disabled = true);
 
             if(isCorrect) {
                 playWin();
-                btn.style.background = "#2ecc71"; btn.style.color = "white"; btn.style.borderColor = "#27ae60";
+                btn.style.background = "#2ecc71"; 
+                btn.style.borderColor = "#27ae60";
+                // Update Score
                 scores[currentTeamIndex]++;
                 document.getElementById(`score-${currentTeamIndex}`).innerText = scores[currentTeamIndex];
             } else {
                 playLoss();
-                btn.style.background = "#e74c3c"; btn.style.color = "white"; btn.style.borderColor = "#c0392b";
+                btn.style.background = "#e74c3c"; 
+                btn.style.borderColor = "#c0392b";
             }
 
+            // Show References for all languages
             const refBox = document.getElementById('mReference');
-            const t = translations[currentLang];
-            refBox.innerHTML = `<strong>${t.ref}</strong><br>${ref}`;
+            qSet.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'ref-item';
+                div.setAttribute('dir', item.lang === 'ar' ? 'rtl' : 'ltr');
+                // Simple Label
+                const label = item.lang === 'ar' ? 'الشاهد:' : (item.lang === 'fr' ? 'Référence:' : 'Ref:');
+                div.innerHTML = `<strong>${label}</strong> ${item.data.r}`;
+                refBox.appendChild(div);
+            });
+
             refBox.style.display = 'block';
             document.getElementById('closeBtn').style.display = 'inline-block';
         }
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
-            if (selectedIndex !== -1) {
-                currentQuestions.splice(selectedIndex, 1);
-                selectedIndex = -1;
+            
+            // Remove ID from list
+            const idxToRemove = currentQuestions.indexOf(selectedId);
+            if (idxToRemove !== -1) {
+                currentQuestions.splice(idxToRemove, 1);
             }
+            
+            // Next Team
             currentTeamIndex++;
             if(currentTeamIndex >= numTeams) currentTeamIndex = 0;
             updateTurnUI();
+            
             drawWheel();
         }
 
-        // =====================================
-        // 5. GAME OVER
-        // =====================================
         function showGameOver() {
             const modal = document.getElementById('gameOverModal');
             const list = document.getElementById('rankList');
             list.innerHTML = "";
-            const t = translations[currentLang];
-
             let ranking = scores.map((s, i) => ({ id: i+1, score: s }));
             ranking.sort((a, b) => b.score - a.score);
 
-            document.getElementById('winnerName').innerText = `🎉 ${t.winner}: ${t.team} ${ranking[0].id} 🎉`;
+            document.getElementById('winnerName').innerText = `🏆 Winner: Team ${ranking[0].id}`;
 
             ranking.forEach((r, idx) => {
                 let badge = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : ""));
                 list.innerHTML += `
                     <li class="rank-item">
-                        <span>${badge} ${t.team} ${r.id}</span>
-                        <span>${r.score}</span>
+                        <span>${badge} Team ${r.id}</span>
+                        <span>${r.score} pts</span>
                     </li>
                 `;
             });
-
             modal.style.display = 'flex';
             playWin();
         }
 
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e=>{});
+            else if (document.exitFullscreen) document.exitFullscreen();
+        }
+
         // =====================================
-        // 6. AUDIO
+        // AUDIO (Simple)
         // =====================================
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
