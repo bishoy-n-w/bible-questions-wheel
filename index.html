@@ -100,9 +100,32 @@
         .team-btn.selected { background: var(--accent-color); color: var(--bg-color); border-color: var(--accent-color); font-weight: bold; transform: scale(1.1); }
 
         .group-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 500px; margin-bottom: 20px; }
-        .group-btn { background: white; color: var(--bg-color); border: 3px solid transparent; padding: 10px; font-size: 1rem; border-radius: 10px; cursor: pointer; font-weight: bold; opacity: 0.8; transition: all 0.2s; }
+        .group-btn { 
+            background: white; 
+            color: var(--bg-color); 
+            border: 3px solid transparent; 
+            padding: 15px 10px; 
+            font-size: 1rem; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            opacity: 0.8; 
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+        }
         .group-btn:hover { opacity: 1; transform: translateY(-2px); }
         .group-btn.selected { border-color: var(--selected-color); background: #e8f8f5; color: #27ae60; opacity: 1; }
+        
+        .group-count {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-weight: normal;
+            margin-top: 4px;
+        }
 
         .action-btn { background: var(--accent-color); color: var(--bg-color); border: none; padding: 15px 50px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; margin-top: 10px;}
         .action-btn:disabled { background: #7f8c8d; cursor: not-allowed; opacity: 0.5; }
@@ -132,7 +155,7 @@
         .q-text-item[lang="ar"] { font-family: 'Segoe UI', Tahoma; font-size: 1.3rem; }
         
         /* Options Block */
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; margin-bottom: 20px; }
         .opt-btn { 
             padding: 10px; 
             border: 2px solid #bdc3c7; 
@@ -149,8 +172,21 @@
         .opt-subtext { font-size: 0.9rem; margin: 2px 0; width: 100%; }
         .opt-subtext:not(:last-child) { border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 2px; }
         
-        .reference-box { display: none; margin-top: 15px; padding: 10px; background: #f8f9fa; border-left: 5px solid #2ecc71; text-align: left; font-size: 0.9rem; }
-        .ref-item { margin-bottom: 8px; }
+        /* Reference Box (Bottom) */
+        .reference-box { 
+            display: none; 
+            margin-top: 10px; 
+            padding: 15px; 
+            background: #ecf0f1; 
+            border-radius: 10px;
+            text-align: left; 
+            font-size: 0.95rem; 
+            width: 100%;
+            box-sizing: border-box;
+            border-top: 4px solid #2ecc71;
+        }
+        .ref-item { margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .ref-item:last-child { border-bottom: none; margin-bottom: 0; }
 
         /* --- Game Over --- */
         .winner-box { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #2c3e50; padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; }
@@ -163,9 +199,10 @@
             .scoreboard { width: 120px; height: 100%; top:0; right:0; left: auto; flex-direction: column; justify-content: center; }
             .wheel-container { margin: 0; height: 85vmin; width: 85vmin; margin-right: 130px; }
             .controls { position: absolute; bottom: 10px; left: 20px; }
-            .modal-box { flex-direction: row; max-width: 90vw; text-align: left; }
-            .q-container { width: 50%; border-bottom: none; border-right: 2px solid #ecf0f1; padding-right: 15px; margin-right: 15px; margin-bottom: 0;}
-            .options-grid { width: 50%; }
+            .modal-box { flex-direction: row; flex-wrap: wrap; max-width: 90vw; text-align: left; justify-content: space-between;}
+            .q-container { width: 100%; }
+            .options-grid { width: 48%; }
+            .reference-box { width: 48%; margin-top: 0; }
         }
         
         /* PC Optimization (Larger Screens) */
@@ -193,9 +230,9 @@
     </div>
 
     <div id="introScreen" class="screen">
-        <h1>Settings</h1>
+        <h1 id="ui-title">Settings</h1>
         
-        <div class="section-title">Teams / الفرق</div>
+        <div class="section-title" id="ui-teams">Teams</div>
         <div class="team-select-grid">
             <button class="team-btn selected" onclick="selectTeams(1)">1</button>
             <button class="team-btn" onclick="selectTeams(2)">2</button>
@@ -203,12 +240,12 @@
             <button class="team-btn" onclick="selectTeams(4)">4</button>
         </div>
 
-        <div class="section-title">Question Group / المجموعة</div>
+        <div class="section-title" id="ui-groups">Select Level</div>
         <div class="group-grid">
-            <button class="group-btn" id="btn-1" onclick="toggleGroup(1)">1-25</button>
-            <button class="group-btn" id="btn-2" onclick="toggleGroup(2)">26-50</button>
-            <button class="group-btn" id="btn-3" onclick="toggleGroup(3)">51-75</button>
-            <button class="group-btn" id="btn-4" onclick="toggleGroup(4)">76-100</button>
+            <button class="group-btn" id="btn-1" onclick="toggleGroup(1)">Level 1</button>
+            <button class="group-btn" id="btn-2" onclick="toggleGroup(2)">Level 2</button>
+            <button class="group-btn" id="btn-3" onclick="toggleGroup(3)">Level 3</button>
+            <button class="group-btn" id="btn-4" onclick="toggleGroup(4)">Level 4</button>
         </div>
 
         <button class="action-btn" id="startBtn" onclick="confirmStart()" disabled>Start Game</button>
@@ -233,21 +270,19 @@
         <div class="modal-box">
             <span id="mLevel" style="padding: 3px 10px; border-radius: 12px; color: white; font-size: 0.8rem; align-self:center; margin-bottom:5px;">Level</span>
             
-            <div class="q-container" id="mQuestionContainer">
-                </div>
+            <div class="q-container" id="mQuestionContainer"></div>
 
-            <div class="options-grid" id="mOptions">
-                </div>
+            <div class="options-grid" id="mOptions"></div>
 
             <div class="reference-box" id="mReference"></div>
             
-            <button class="action-btn" id="closeBtn" style="display:none; align-self: center; margin-top:15px; font-size:1rem; padding: 10px 30px;" onclick="closeModal()">Next ➡</button>
+            <button class="action-btn" id="closeBtn" style="display:none; align-self: center; margin-top:10px; font-size:1rem; padding: 10px 40px;" onclick="closeModal()">Next ➡</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="gameOverModal">
         <div class="winner-box">
-            <h2 style="margin:0; font-size:2rem;">🏆 Results</h2>
+            <h2 style="margin:0; font-size:2rem;" id="ui-results">🏆 Results</h2>
             <div id="winnerName" style="font-size:1.5rem; margin:15px 0; font-weight:bold;"></div>
             <ul class="rank-list" id="rankList"></ul>
             <button class="action-btn" style="background:white; color:#2c3e50; font-weight:bold; margin-top:20px;" onclick="location.reload()">New Game</button>
@@ -258,11 +293,22 @@
 
     <script>
         // =====================================
+        // TRANSLATION STRINGS
+        // =====================================
+        const uiText = {
+            ar: { settings: "الإعدادات", teams: "الفرق", groups: "المستوى", start: "ابدأ", spin: "دوّر", turn: "دور", team: "فريق", results: "النتائج", easy:"سهل", medium:"متوسط", hard:"صعب", expert:"خبير", qs:"سؤال" },
+            en: { settings: "Settings", teams: "Teams", groups: "Level", start: "Start", spin: "Spin", turn: "Turn", team: "Team", results: "Results", easy:"Easy", medium:"Medium", hard:"Hard", expert:"Expert", qs:"Q" },
+            fr: { settings: "Paramètres", teams: "Équipes", groups: "Niveau", start: "Commencer", spin: "Tourner", turn: "Tour", team: "Équipe", results: "Résultats", easy:"Facile", medium:"Moyen", hard:"Difficile", expert:"Expert", qs:"Q" }
+        };
+
+        const difficultyMap = { 1: "easy", 2: "medium", 3: "hard", 4: "expert" };
+
+        // =====================================
         // STATE
         // =====================================
-        let selectedLangs = new Set(['ar']); // Default
-        let activeLangArray = []; // Array of lang codes ['ar', 'en']
-        let currentQuestions = []; // IDs only
+        let selectedLangs = new Set(['ar']); 
+        let activeLangArray = []; 
+        let currentQuestions = []; 
         let selectedGroups = new Set();
         let numTeams = 1;
         let scores = [0, 0, 0, 0];
@@ -277,7 +323,6 @@
         function toggleLang(lang) {
             const btn = document.getElementById(`lang-${lang}`);
             if (selectedLangs.has(lang)) {
-                // Prevent deselecting if it's the last one
                 if (selectedLangs.size > 1) {
                     selectedLangs.delete(lang);
                     btn.classList.remove('active');
@@ -288,17 +333,48 @@
             }
         }
 
+        function getMultiLangText(key) {
+            return activeLangArray.map(l => uiText[l][key]).join(' / ');
+        }
+
         function goToIntro() {
+            if (typeof gameData === 'undefined') { alert("Error: questions.js not loaded."); return; }
             activeLangArray = Array.from(selectedLangs);
             
-            // Validate Data
-            if (typeof gameData === 'undefined') {
-                alert("Error: questions.js not loaded.");
-                return;
-            }
+            // Update Intro UI Text dynamically
+            document.getElementById('ui-title').innerText = getMultiLangText('settings');
+            document.getElementById('ui-teams').innerText = getMultiLangText('teams');
+            document.getElementById('ui-groups').innerText = getMultiLangText('groups');
+            document.getElementById('startBtn').innerText = getMultiLangText('start');
+            document.getElementById('ui-results').innerText = getMultiLangText('results');
+            document.getElementById('spinBtn').innerText = getMultiLangText('spin');
+
+            updateGroupButtons();
 
             document.getElementById('langScreen').style.display = 'none';
             document.getElementById('introScreen').style.display = 'flex';
+        }
+
+        function updateGroupButtons() {
+            // Update buttons 1-4
+            for(let i=1; i<=4; i++) {
+                const btn = document.getElementById(`btn-${i}`);
+                
+                // 1. Get Difficulty Name in all langs
+                const diffKey = difficultyMap[i];
+                const label = activeLangArray.map(l => uiText[l][diffKey]).join(' / ');
+                
+                // 2. Count Questions for this level in all selected langs
+                let count = 0;
+                activeLangArray.forEach(l => {
+                    const qs = gameData[l].filter(q => q.l === i);
+                    count += qs.length;
+                });
+                
+                // 3. Set HTML
+                const qsLabel = activeLangArray[0] === 'ar' ? 'سؤال' : 'Qs';
+                btn.innerHTML = `${label}<br><span class="group-count">(${count} ${qsLabel})</span>`;
+            }
         }
 
         // =====================================
@@ -325,11 +401,10 @@
         }
 
         function confirmStart() {
-            // Get valid IDs from the first selected language (assuming all langs have same IDs)
-            const primaryLang = activeLangArray[0];
-            const masterList = gameData[primaryLang];
-
-            // Filter IDs based on groups
+            // Get IDs from first lang (Ids are synced)
+            const masterList = gameData[activeLangArray[0]];
+            
+            // Filter
             currentQuestions = masterList.filter(q => {
                 let g = 0;
                 if (q.id <= 25) g = 1;
@@ -337,21 +412,22 @@
                 else if (q.id <= 75) g = 3;
                 else if (q.id <= 100) g = 4;
                 return selectedGroups.has(g);
-            }).map(q => q.id); // Store ONLY IDs
+            }).map(q => q.id); 
 
             if(currentQuestions.length === 0) return;
 
-            // Init Game
+            // Init Scores
             scores = new Array(numTeams).fill(0);
             currentTeamIndex = 0;
             
             // Build Scoreboard
             const sb = document.getElementById('scoreboard');
             sb.innerHTML = '';
+            const teamLabel = getMultiLangText('team');
             for(let i=0; i<numTeams; i++) {
                 sb.innerHTML += `
                     <div class="team-card" id="team-card-${i}">
-                        <span class="team-name">Team ${i+1}</span>
+                        <span class="team-name">${teamLabel} ${i+1}</span>
                         <span class="team-score" id="score-${i}">0</span>
                     </div>
                 `;
@@ -370,7 +446,9 @@
                 if(i === currentTeamIndex) card.classList.add('active-turn');
                 else card.classList.remove('active-turn');
             }
-            document.getElementById('turnMsg').innerText = `Turn: Team ${currentTeamIndex + 1}`;
+            const turnLabel = getMultiLangText('turn');
+            const teamLabel = getMultiLangText('team');
+            document.getElementById('turnMsg').innerText = `${turnLabel}: ${teamLabel} ${currentTeamIndex + 1}`;
         }
 
         // =====================================
@@ -393,7 +471,6 @@
             ctx.clearRect(0, 0, size, size);
 
             for (let i = 0; i < currentQuestions.length; i++) {
-                // Get Level Color from primary lang data
                 const qId = currentQuestions[i];
                 const qData = gameData[activeLangArray[0]].find(q => q.id === qId);
                 
@@ -406,7 +483,6 @@
                 ctx.fill();
                 ctx.strokeStyle = "#2c3e50"; ctx.lineWidth = 2; ctx.stroke();
                 
-                // Render Number
                 if(currentQuestions.length <= 60) {
                     ctx.save();
                     ctx.translate(center, center);
@@ -468,21 +544,17 @@
             document.getElementById('closeBtn').style.display = 'none';
             document.getElementById('mReference').style.display = 'none';
 
-            // 1. Get Data for this ID from all selected languages
-            // Structure: [{lang:'ar', data: {...}}, {lang:'en', data: {...}}]
+            // Gather Data
             let qSet = activeLangArray.map(lang => {
-                return { 
-                    lang: lang, 
-                    data: gameData[lang].find(q => q.id === id) 
-                };
+                return { lang: lang, data: gameData[lang].find(q => q.id === id) };
             });
 
-            // 2. Set Level Badge (Use first lang)
+            // Set Badge
             const firstQ = qSet[0].data;
             document.getElementById('mLevel').innerText = `Level ${firstQ.l}`;
             document.getElementById('mLevel').style.background = levelColors[firstQ.l];
 
-            // 3. Render Question Texts
+            // Render Questions
             qSet.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'q-text-item';
@@ -492,21 +564,16 @@
                 qContainer.appendChild(div);
             });
 
-            // 4. Handle Options
-            // We need to shuffle INDICES [0,1,2,3], not the arrays themselves, 
-            // to keep the languages synchronized.
+            // Render Options
             let indices = [0, 1, 2, 3];
             for (let i = indices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [indices[i], indices[j]] = [indices[j], indices[i]];
             }
 
-            // Create buttons based on shuffled indices
             indices.forEach(idx => {
                 const btn = document.createElement('button');
                 btn.className = "opt-btn";
-                
-                // Add text for each language in this button
                 qSet.forEach(item => {
                     const span = document.createElement('span');
                     span.className = 'opt-subtext';
@@ -515,10 +582,7 @@
                     btn.appendChild(span);
                 });
 
-                // Check correctness (using the first lang is enough as they are synced)
-                // idx is the current index of the option, firstQ.c is the correct index
                 const isCorrect = (idx === firstQ.c);
-                
                 btn.onclick = () => handleAnswer(btn, isCorrect, qSet);
                 optDiv.appendChild(btn);
             });
@@ -534,7 +598,6 @@
                 playWin();
                 btn.style.background = "#2ecc71"; 
                 btn.style.borderColor = "#27ae60";
-                // Update Score
                 scores[currentTeamIndex]++;
                 document.getElementById(`score-${currentTeamIndex}`).innerText = scores[currentTeamIndex];
             } else {
@@ -543,36 +606,33 @@
                 btn.style.borderColor = "#c0392b";
             }
 
-            // Show References for all languages
+            // Show References
             const refBox = document.getElementById('mReference');
             qSet.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'ref-item';
                 div.setAttribute('dir', item.lang === 'ar' ? 'rtl' : 'ltr');
-                // Simple Label
-                const label = item.lang === 'ar' ? 'الشاهد:' : (item.lang === 'fr' ? 'Référence:' : 'Ref:');
+                const label = item.lang === 'ar' ? 'الشاهد:' : (item.lang === 'fr' ? 'Réf:' : 'Ref:');
                 div.innerHTML = `<strong>${label}</strong> ${item.data.r}`;
                 refBox.appendChild(div);
             });
 
             refBox.style.display = 'block';
             document.getElementById('closeBtn').style.display = 'inline-block';
+            
+            // Auto Scroll to bottom of modal on mobile
+            const modalBox = document.querySelector('.modal-box');
+            setTimeout(() => { modalBox.scrollTop = modalBox.scrollHeight; }, 100);
         }
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
-            
-            // Remove ID from list
             const idxToRemove = currentQuestions.indexOf(selectedId);
-            if (idxToRemove !== -1) {
-                currentQuestions.splice(idxToRemove, 1);
-            }
+            if (idxToRemove !== -1) currentQuestions.splice(idxToRemove, 1);
             
-            // Next Team
             currentTeamIndex++;
             if(currentTeamIndex >= numTeams) currentTeamIndex = 0;
             updateTurnUI();
-            
             drawWheel();
         }
 
@@ -583,14 +643,15 @@
             let ranking = scores.map((s, i) => ({ id: i+1, score: s }));
             ranking.sort((a, b) => b.score - a.score);
 
-            document.getElementById('winnerName').innerText = `🏆 Winner: Team ${ranking[0].id}`;
+            const teamLabel = getMultiLangText('team');
+            document.getElementById('winnerName').innerText = `🏆 ${teamLabel} ${ranking[0].id}`;
 
             ranking.forEach((r, idx) => {
                 let badge = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : ""));
                 list.innerHTML += `
                     <li class="rank-item">
-                        <span>${badge} Team ${r.id}</span>
-                        <span>${r.score} pts</span>
+                        <span>${badge} ${teamLabel} ${r.id}</span>
+                        <span>${r.score}</span>
                     </li>
                 `;
             });
@@ -604,7 +665,7 @@
         }
 
         // =====================================
-        // AUDIO (Simple)
+        // AUDIO
         // =====================================
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
