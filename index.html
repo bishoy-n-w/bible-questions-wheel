@@ -28,6 +28,18 @@
             justify-content: center;
         }
 
+        /* --- Version Tag --- */
+        .version-tag {
+            position: absolute;
+            bottom: 10px;
+            right: 15px; /* Will flip in RTL */
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.3);
+            pointer-events: none;
+            z-index: 50;
+        }
+        [dir="rtl"] .version-tag { right: auto; left: 15px; }
+
         /* --- Fullscreen Btn --- */
         .fullscreen-btn {
             position: fixed;
@@ -44,6 +56,7 @@
             z-index: 1000;
             font-size: 1.2rem;
         }
+        [dir="rtl"] .fullscreen-btn { right: auto; left: 20px; }
 
         /* --- Screens --- */
         .screen {
@@ -91,7 +104,7 @@
             box-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
         }
 
-        /* --- 2. Intro Screen (Shared Styles) --- */
+        /* --- 2. Intro Screen --- */
         h1 { font-size: 1.8rem; margin-bottom: 5px; color: var(--accent-color); text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .section-title { margin-top: 15px; margin-bottom: 10px; font-size: 1rem; color: #bdc3c7; border-bottom: 1px solid #7f8c8d; padding-bottom: 5px; width: 100%; max-width: 400px; }
         
@@ -120,41 +133,61 @@
         .group-btn:hover { opacity: 1; transform: translateY(-2px); }
         .group-btn.selected { border-color: var(--selected-color); background: #e8f8f5; color: #27ae60; opacity: 1; }
         
-        .group-count {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            font-weight: normal;
-            margin-top: 4px;
-        }
+        .group-count { font-size: 0.8rem; color: #7f8c8d; font-weight: normal; margin-top: 4px; }
 
         .action-btn { background: var(--accent-color); color: var(--bg-color); border: none; padding: 15px 50px; font-size: 1.3rem; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.2s; margin-top: 10px;}
         .action-btn:disabled { background: #7f8c8d; cursor: not-allowed; opacity: 0.5; }
 
-        /* --- 3. Game Screen --- */
+        /* --- 3. Game Screen (Default Portrait) --- */
         #gameScreen { position: relative; }
-        .scoreboard { position: absolute; top: 0; left: 0; width: 100%; display: flex; justify-content: space-around; padding: 10px 5px; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); z-index: 30; box-sizing: border-box; }
+        
+        /* Scoreboard: Absolute top in portrait */
+        .scoreboard { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 10px 5px; 
+            background: rgba(0,0,0,0.3); 
+            backdrop-filter: blur(5px); 
+            z-index: 30; 
+            box-sizing: border-box; 
+        }
+        
         .team-card { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 5px; text-align: center; border: 2px solid transparent; transition: all 0.3s; flex: 1; margin: 0 4px; max-width: 90px; }
         .team-card.active-turn { background: white; color: var(--bg-color); border-color: var(--accent-color); transform: scale(1.05); box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
         .team-name { font-size: 0.75rem; display: block; }
         .team-score { font-size: 1.1rem; font-weight: bold; }
 
-        .wheel-container { position: relative; width: 75vmin; height: 75vmin; max-width: 500px; max-height: 500px; margin-top: 60px; margin-bottom: 10px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); }
+        .wheel-container { 
+            position: relative; 
+            width: 75vmin; 
+            height: 75vmin; 
+            max-width: 500px; 
+            max-height: 500px; 
+            margin-top: 60px; /* Space for scoreboard */
+            margin-bottom: 20px; 
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); 
+            flex-shrink: 0;
+        }
+        
         canvas { width: 100%; height: 100%; border-radius: 50%; }
         .pointer { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: #e74c3c; clip-path: polygon(50% 100%, 0 0, 100% 0); z-index: 10; }
 
+        /* Controls: Standard flow in portrait */
         .controls { display: flex; flex-direction: column; align-items: center; z-index: 20; }
         
         /* --- Modal (Multi-Language Support) --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
         .modal-box { background: white; color: var(--bg-color); padding: 20px; border-radius: 15px; width: 100%; max-width: 600px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
         
-        /* Question Block */
         .q-container { margin: 15px 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; }
         .q-text-item { font-size: 1.2rem; margin: 8px 0; line-height: 1.4; font-weight: bold; }
         .q-text-item:not(:last-child) { border-bottom: 1px dashed #bdc3c7; padding-bottom: 8px; }
         .q-text-item[lang="ar"] { font-family: 'Segoe UI', Tahoma; font-size: 1.3rem; }
         
-        /* Options Block */
         .options-grid { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; margin-bottom: 20px; }
         .opt-btn { 
             padding: 10px; 
@@ -193,14 +226,48 @@
         .rank-list { list-style: none; padding: 0; margin-top: 20px; text-align: left; }
         .rank-item { background: rgba(255,255,255,0.3); margin: 5px 0; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; font-weight: bold; }
 
-        /* Landscape Mobile Optimization */
+        /* =========================================
+           LANDSCAPE OPTIMIZATION (NO OVERLAP)
+           ========================================= */
         @media (max-height: 500px) and (orientation: landscape) {
-            #gameScreen { flex-direction: row; align-items: center; }
-            .scoreboard { width: 120px; height: 100%; top:0; right:0; left: auto; flex-direction: column; justify-content: center; }
-            .wheel-container { margin: 0; height: 85vmin; width: 85vmin; margin-right: 130px; }
-            .controls { position: absolute; bottom: 10px; left: 20px; }
-            .modal-box { flex-direction: row; flex-wrap: wrap; max-width: 90vw; text-align: left; justify-content: space-between;}
-            .q-container { width: 100%; }
+            #gameScreen { 
+                flex-direction: row; 
+                justify-content: space-evenly; /* Spread 3 columns */
+                align-items: center;
+                padding: 0 10px;
+            }
+
+            /* 1. Scoreboard: Moves to side */
+            .scoreboard { 
+                position: static; /* No longer absolute */
+                width: 120px; 
+                height: 90vh; 
+                flex-direction: column; 
+                justify-content: center;
+                gap: 10px;
+                background: transparent; /* Cleaner look in column */
+                backdrop-filter: none;
+            }
+            .team-card { margin: 5px 0; width: 100%; max-width: none; }
+
+            /* 2. Wheel: Center */
+            .wheel-container { 
+                margin: 0 10px; 
+                height: 70vmin; /* Smaller to prevent overlap */
+                width: 70vmin; 
+            }
+
+            /* 3. Controls: Move to opposite side */
+            .controls {
+                width: 120px;
+                height: 90vh;
+                justify-content: center;
+                text-align: center;
+            }
+
+            /* Fix Modal for Landscape */
+            .modal-box { flex-direction: row; flex-wrap: wrap; max-width: 95vw; justify-content: space-between; padding: 15px;}
+            .q-container { width: 100%; margin: 5px 0;}
             .options-grid { width: 48%; }
             .reference-box { width: 48%; margin-top: 0; }
         }
@@ -218,6 +285,8 @@
 
     <div id="langScreen" class="screen">
         <h1 style="margin-bottom: 10px;">Bible Quiz</h1>
+        <div class="version-tag" style="position:static; margin-bottom: 20px; color:#f1c40f;">v2.0</div>
+        
         <p style="color:#bdc3c7; margin-bottom:30px;">Select Language(s) / اختر اللغة</p>
         
         <div class="lang-grid">
@@ -230,6 +299,7 @@
     </div>
 
     <div id="introScreen" class="screen">
+        <div class="version-tag">v2.0</div>
         <h1 id="ui-title">Settings</h1>
         
         <div class="section-title" id="ui-teams">Teams</div>
@@ -253,6 +323,7 @@
     </div>
 
     <div id="gameScreen" class="screen">
+        <div class="version-tag">v2.0</div>
         <div class="scoreboard" id="scoreboard"></div>
 
         <div class="wheel-container">
@@ -341,7 +412,7 @@
             if (typeof gameData === 'undefined') { alert("Error: questions.js not loaded."); return; }
             activeLangArray = Array.from(selectedLangs);
             
-            // Update Intro UI Text dynamically
+            // Apply text
             document.getElementById('ui-title').innerText = getMultiLangText('settings');
             document.getElementById('ui-teams').innerText = getMultiLangText('teams');
             document.getElementById('ui-groups').innerText = getMultiLangText('groups');
@@ -364,7 +435,7 @@
                 const diffKey = difficultyMap[i];
                 const label = activeLangArray.map(l => uiText[l][diffKey]).join(' / ');
                 
-                // 2. Count Questions for this level in all selected langs
+                // 2. Count Questions
                 let count = 0;
                 activeLangArray.forEach(l => {
                     const qs = gameData[l].filter(q => q.l === i);
@@ -401,7 +472,7 @@
         }
 
         function confirmStart() {
-            // Get IDs from first lang (Ids are synced)
+            // Get IDs from first lang
             const masterList = gameData[activeLangArray[0]];
             
             // Filter
@@ -620,7 +691,6 @@
             refBox.style.display = 'block';
             document.getElementById('closeBtn').style.display = 'inline-block';
             
-            // Auto Scroll to bottom of modal on mobile
             const modalBox = document.querySelector('.modal-box');
             setTimeout(() => { modalBox.scrollTop = modalBox.scrollHeight; }, 100);
         }
